@@ -1,2 +1,3 @@
+git+https://github.com/astronomy-commons/hipscat.git@main
 git+https://github.com/astronomy-commons/lsdb.git@main
 git+https://github.com/lincc-frameworks-mask-incubator/gundam.git@main
