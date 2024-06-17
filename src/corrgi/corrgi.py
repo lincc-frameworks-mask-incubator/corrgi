@@ -1,11 +1,12 @@
+from typing import Callable
+
 import gundam
 import numpy as np
 from dask.delayed import Delayed
 from lsdb import Catalog
 from lsdb.dask.merge_catalog_functions import align_and_apply, get_healpix_pixels_from_alignment
-from munch import Munch
 
-from corrgi.alignment import get_pixel_alignment
+from corrgi.alignment import autocorrelation_alignment
 from corrgi.dask import count_pairs
 from corrgi.estimators import compute_natural_estimate
 from corrgi.parameters import generate_gundam_params
@@ -31,8 +32,8 @@ def compute_autocorrelation(catalog: Catalog, random: Catalog) -> np.ndarray:
     bins, _ = gundam.makebins(params_dd.nsept, params_dd.septmin, params_dd.dsept, params_dd.logsept)
 
     # Generate the histograms with counts for each catalog
-    counts_dd = perform_counts(catalog, catalog, bins, params_dd)
-    counts_rr = perform_counts(random, random, bins, params_rr)
+    counts_dd = perform_counts(catalog, catalog, autocorrelation_alignment, bins, params_dd)
+    counts_rr = perform_counts(random, random, autocorrelation_alignment, bins, params_rr)
 
     counts_dd = counts_dd.compute()
     counts_rr = counts_rr.compute()
@@ -55,19 +56,19 @@ def compute_crosscorrelation(left: Catalog, right: Catalog, random: Catalog) -> 
     raise NotImplementedError()
 
 
-def perform_counts(left: Catalog, right: Catalog, bins: np.ndarray, params: Munch) -> Delayed:
+def perform_counts(left: Catalog, right: Catalog, alignment: Callable, *args) -> Delayed:
     """Aligns the pixel of two catalogs and performs the pairs counting.
 
     Args:
         left (Catalog): The left catalog.
         right (Catalog): The right catalog.
-        bins (np.ndarray): The bins, in angular space.
-        params (Munch): The gundam parameters.
+        alignment (PixelAlignment): The pixel alignment method.
+        *args: The arguments to pass to the count_pairs method.
 
     Returns:
         The histogram with the counts for the
     """
-    alignment = get_pixel_alignment(left, right)
+    alignment = alignment(left, right)
     left_pixels, right_pixels = get_healpix_pixels_from_alignment(alignment)
-    partials = align_and_apply([(left, left_pixels), (right, right_pixels)], count_pairs, bins, params)
+    partials = align_and_apply([(left, left_pixels), (right, right_pixels)], count_pairs, *args)
     return join_count_histograms(partials)
