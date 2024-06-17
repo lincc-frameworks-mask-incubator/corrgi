@@ -66,3 +66,4 @@ def count_pairs(
         # ll1,
     ]
     return cff.mod.th_Cb(*args)  # fast unweighted counting
+    # return np.array([1, 2, 3], dtype=np.int64)

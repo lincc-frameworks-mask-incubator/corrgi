@@ -1,6 +1,4 @@
-import dask.array as da
 import numpy as np
-from dask.delayed import Delayed
 from numpy import deg2rad
 
 
@@ -36,18 +34,14 @@ def project_bins(sep: np.ndarray) -> np.ndarray:
     return (np.sin(0.5 * sep * deg2rad)) ** 2
 
 
-def join_count_histograms(partial_histograms: list[Delayed]) -> Delayed:
-    """Joins the partial count histograms (lazily).
+def join_count_histograms(partial_histograms: list[np.ndarray]) -> np.ndarray:
+    """Joins the partial count histograms.
 
     Args:
-        partial_histograms (list[np.ndarray]): The list of delayed count
-            histograms, generated for each partition pair.
+        partial_histograms (list[np.ndarray]): The list of count histograms
+            generated for each pair of partitions.
 
     Returns:
-        The delayed numpy array that results from combining all partial histograms.
+        The numpy array that results from combining all partial histograms.
     """
-    if len(partial_histograms) == 0:
-        raise ValueError("No partial histograms provided!")
-    stacked_arrays = da.stack(partial_histograms)
-    count_histogram = da.sum(stacked_arrays, axis=0)
-    return count_histogram
+    return np.sum(np.stack(partial_histograms), axis=0)
