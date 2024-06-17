@@ -20,6 +20,7 @@ dependencies = [
     "lsdb",
     "hipscat",
     "gundam",
+    "numpy<2",
 ]
 
 [project.urls]
