@@ -35,7 +35,8 @@ def autocorrelation_alignment(catalog: Catalog) -> PixelAlignment:
         [
             [pix.order, pix.pixel, pix.order, pix.pixel, pix.order, pix.pixel]
             for pix in catalog.get_healpix_pixels()
-        ]
+        ],
+        columns=column_names,
     )
     result_mapping = pd.concat([upper_triangle, diagonal])
     return PixelAlignment(catalog.pixel_tree, result_mapping, PixelAlignmentType.OUTER)
