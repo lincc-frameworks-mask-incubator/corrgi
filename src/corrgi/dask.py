@@ -2,11 +2,59 @@ import dask
 import gundam.cflibfor as cff
 import numpy as np
 import pandas as pd
+from dask.delayed import Delayed
+from gundam import gundam
 from hipscat.catalog.catalog_info import CatalogInfo
 from hipscat.pixel_math import HealpixPixel
+from lsdb import Catalog
+from lsdb.dask.merge_catalog_functions import align_and_apply, get_healpix_pixels_from_alignment
 from munch import Munch
 
-from corrgi.utils import project_coordinates
+from corrgi.alignment import autocorrelation_alignment, crosscorrelation_alignment
+from corrgi.parameters import generate_dd_rr_params
+from corrgi.utils import join_count_histograms, project_coordinates
+
+
+def compute_autocorrelation_counts(catalog: Catalog, random: Catalog, params: Munch) -> np.ndarray:
+    """Computes the auto-correlation counts for a catalog.
+
+    Args:
+        catalog (Catalog): The catalog with galaxy samples.
+        random (Catalog): The catalog with random samples.
+        params (dict): The gundam parameters for the Fortran subroutine.
+
+    Returns:
+        The histogram counts to calculate the auto-correlation.
+    """
+    # Calculate the angular separation bins
+    bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
+    params_dd, params_rr = generate_dd_rr_params(params)
+    # Generate the histograms with counts for each catalog
+    counts_dd = perform_counts(catalog, catalog, bins, params_dd)
+    counts_rr = perform_counts(random, random, bins, params_rr)
+    # Actually compute the results
+    return dask.compute(*[counts_dd, counts_rr])
+
+
+def perform_counts(left: Catalog, right: Catalog, *args) -> Delayed:
+    """Aligns the pixel of two catalogs and performs the pairs counting.
+
+    Args:
+        left (Catalog): The left catalog.
+        right (Catalog): The right catalog.
+        *args: The arguments to pass to the count_pairs method.
+
+    Returns:
+        The histogram with the sample distance counts.
+    """
+    alignment = (
+        crosscorrelation_alignment(left.hc_structure, right.hc_structure)
+        if left != right
+        else autocorrelation_alignment(left.hc_structure)
+    )
+    left_pixels, right_pixels = get_healpix_pixels_from_alignment(alignment)
+    partials = align_and_apply([(left, left_pixels), (right, right_pixels)], count_pairs, *args)
+    return join_count_histograms(partials)
 
 
 @dask.delayed
@@ -44,7 +92,7 @@ def count_pairs(
         ra=right_df[right_catalog_info.ra_column].to_numpy(),
         dec=right_df[right_catalog_info.dec_column].to_numpy(),
     )
-    # Pack arguments to the th_Cb subroutine
+    # Pack arguments to the th_C subroutine
     args = [
         1,  # number of threads OpenMP
         len(left_df),  # number of particles
