@@ -22,7 +22,11 @@ def compute_autocorrelation(catalog: Catalog, random: Catalog) -> np.ndarray:
     Returns:
         The natural estimate for the auto-correlation function.
     """
-    params = gundam.packpars(kind="acf", write=False)
+    params = gundam.packpars(kind="acf1", write=False)
+
+    params.dsept = 0.10
+    params.nsept = 33
+    params.septmin = 0.01
 
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)

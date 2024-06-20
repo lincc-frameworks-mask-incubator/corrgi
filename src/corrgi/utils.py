@@ -18,7 +18,7 @@ def project_coordinates(ra: np.ndarray, dec: np.ndarray) -> np.ndarray:
     x = 0.5 * np.cos(ra) * np.cos(dec)
     y = 0.5 * np.cos(ra) * np.sin(dec)
     z = 0.5 * np.sin(ra)
-    return np.stack([x, y, z], axis=1)
+    return x, y, z
 
 
 def project_bins(sep: np.ndarray) -> np.ndarray:

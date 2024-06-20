@@ -36,11 +36,11 @@ def count_pairs(
        The delayed count histogram for the partition pair.
     """
     # Distance must be converted to cartesian space
-    left_xyz = project_coordinates(
+    left_x, left_y, left_z = project_coordinates(
         ra=left_df[left_catalog_info.ra_column].to_numpy(),
         dec=left_df[left_catalog_info.dec_column].to_numpy(),
     )
-    right_xyz = project_coordinates(
+    right_x, right_y, right_z = project_coordinates(
         ra=right_df[right_catalog_info.ra_column].to_numpy(),
         dec=right_df[right_catalog_info.dec_column].to_numpy(),
     )
@@ -50,20 +50,22 @@ def count_pairs(
         len(left_df),  # number of particles
         left_df[left_catalog_info.ra_column].to_numpy(),  # RA of particles [deg]
         left_df[left_catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
-        left_xyz,  # X,Y,Z coordinates of particles (see radec2xyz())
+        left_x,
+        left_y,
+        left_z,  # X,Y,Z coordinates of particles (see radec2xyz())
         len(right_df),  # number of particles
-        right_xyz,  # X,Y,Z coordinates of particles (see radec2xyz())
+        right_x,
+        right_y,
+        right_z,  # X,Y,Z coordinates of particles (see radec2xyz())
         params.nsept,  # Number of angular separation bins
         bins,  # Bins in angular separation [deg]
         params.sbound,
         params.mxh1,
         params.mxh2,
-        params.nbts,
-        params.bseed,
         params.cntid,
-        # logff,
-        # sk1,
-        # ll1,
+        params.logf,
+        params.sk1,
+        np.zeros(len(right_df)),  # ll1
+        params.grid,
     ]
-    return cff.mod.th_Cb(*args)  # fast unweighted counting
-    # return np.array([1, 2, 3], dtype=np.int64)
+    return cff.mod.th_C(*args)  # fast unweighted counting
