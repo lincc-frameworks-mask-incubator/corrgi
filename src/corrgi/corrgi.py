@@ -32,8 +32,8 @@ def compute_autocorrelation(catalog: Catalog, random: Catalog) -> np.ndarray:
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
     params_dd, params_rr = create_gundam_params(params)
 
-    left_len = catalog.hc_structure.catalog_info.total_rows
-    right_len = random.hc_structure.catalog_info.total_rows
+    num_galaxies = catalog.hc_structure.catalog_info.total_rows
+    num_rand = random.hc_structure.catalog_info.total_rows
 
     # Generate the histograms with counts for each catalog
     counts_dd = perform_counts(catalog, catalog, bins, params_dd)
@@ -43,7 +43,7 @@ def compute_autocorrelation(catalog: Catalog, random: Catalog) -> np.ndarray:
     counts_dd, counts_rr = dask.compute(*[counts_dd, counts_rr])
 
     # Compute the auto-correlation using the natural estimator
-    return compute_natural_estimate(counts_dd, counts_rr, left_len, right_len)
+    return compute_natural_estimate(counts_dd, counts_rr, num_galaxies, num_rand)
 
 
 def compute_crosscorrelation(left: Catalog, right: Catalog, random: Catalog) -> np.ndarray:

@@ -18,15 +18,14 @@ def create_gundam_params(params: Munch) -> tuple[Munch, Munch]:
     params.sbound = [1, 2, 1, 2]
     params.mxh1 = 2
     params.mxh2 = 2
-    params.logff = ""
     params.sk1 = [[1, 2], [1, 2]]
     # Create the parameters for both catalogs
     par_dd = deepcopy(params)
-    par_dd.kind = "thA"
+    par_dd.kind = "thC"
     par_dd.cntid = "DD"
     par_dd.logf = "DD_log"
     par_rr = deepcopy(params)
-    par_rr.kind = "thA"
+    par_rr.kind = "thC"
     par_rr.cntid = "RR"
     par_rr.logf = "RR_log"
     par_rr.wfib = False  # don't do fiber corrections in random counts

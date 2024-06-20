@@ -47,3 +47,8 @@ def dr7_lrg_rand_catalog_dir(test_data_dir):
 @pytest.fixture
 def w_acf_nat(test_data_dir):
     return np.load(test_data_dir / "correlations" / "w_acf_nat.npy")
+
+
+@pytest.fixture
+def w_acf_nat_true(test_data_dir):
+    return np.load(test_data_dir / "correlations" / "w_acf_nat_true.npy")
