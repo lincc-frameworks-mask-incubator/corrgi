@@ -51,6 +51,11 @@ def w_acf_nat(test_data_dir):
 
 
 @pytest.fixture
+def results_dir(test_data_dir):
+    return test_data_dir / "results"
+
+
+@pytest.fixture
 def w_acf_nat_true(test_data_dir):
     return np.load(test_data_dir / "correlations" / "w_acf_nat_true.npy")
 
@@ -85,3 +90,28 @@ def autocorr_params():
     params.mxh2 = 2
     params.sk1 = [[1, 2], [1, 2]]
     return params
+
+
+@pytest.fixture
+def acf1_nat_estimate(results_dir):
+    return np.load(results_dir / "w_acf_nat.npy")
+
+
+@pytest.fixture
+def acf1_dd_counts(results_dir):
+    return np.load(results_dir / "dd_acf.npy")
+
+
+@pytest.fixture
+def acf1_rr_counts(results_dir):
+    return np.load(results_dir / "rr_acf.npy")
+
+
+@pytest.fixture
+def acf1_bins_left_edges(results_dir):
+    return np.load(results_dir / "l_binedges_acf.npy")
+
+
+@pytest.fixture
+def acf1_bins_right_edges(results_dir):
+    return np.load(results_dir / "r_binedges_acf.npy")
