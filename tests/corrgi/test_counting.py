@@ -8,6 +8,7 @@ from corrgi.dask import count_auto_pairs, count_pairs
 
 
 def test_count_auto_pairs(
+        dask_client,
     single_data_partition,
     data_catalog_dir,
     corr_bins,
