@@ -1,15 +1,16 @@
 from pathlib import Path
 
+import gundam
 import numpy as np
+import pandas as pd
 import pytest
-
 from dask.distributed import Client
 
 
 @pytest.fixture(scope="session", name="dask_client")
 def dask_client():
     """Create a single client for use by all unit test cases."""
-    client = Client(n_workers=3, threads_per_worker=1)
+    client = Client(n_workers=1, threads_per_worker=1)
     yield client
     client.close()
 
@@ -52,3 +53,35 @@ def w_acf_nat(test_data_dir):
 @pytest.fixture
 def w_acf_nat_true(test_data_dir):
     return np.load(test_data_dir / "correlations" / "w_acf_nat_true.npy")
+
+
+@pytest.fixture
+def single_data_partition(data_catalog_dir):
+    return pd.read_parquet(data_catalog_dir / "Norder=0" / "Dir=0" / "Npix=1.parquet")
+
+
+@pytest.fixture
+def corr_bins():
+    bins, _ = gundam.makebins(33, 0.01, 0.1, 1)
+    return bins
+
+
+@pytest.fixture
+def autocorr_params():
+    params = gundam.packpars(kind="acf", write=False)
+
+    params.dsept = 0.10
+    params.nsept = 33
+    params.septmin = 0.01
+
+    params.kind = "thA"
+    params.cntid = "DD"
+    params.logf = "DD_log"
+
+    # Disable grid and fill some mock parameters
+    params.grid = 0
+    params.sbound = [1, 2, 1, 2]
+    params.mxh1 = 2
+    params.mxh2 = 2
+    params.sk1 = [[1, 2], [1, 2]]
+    return params

@@ -8,7 +8,7 @@ from munch import Munch
 
 from corrgi.utils import project_coordinates
 
-
+from dask.distributed import print as dask_print
 @dask.delayed
 def count_pairs(
     left_df: pd.DataFrame,
@@ -35,37 +35,85 @@ def count_pairs(
     Returns:
        The delayed count histogram for the partition pair.
     """
-    # Distance must be converted to cartesian space
-    left_x, left_y, left_z = project_coordinates(
-        ra=left_df[left_catalog_info.ra_column].to_numpy(),
-        dec=left_df[left_catalog_info.dec_column].to_numpy(),
-    )
-    right_x, right_y, right_z = project_coordinates(
-        ra=right_df[right_catalog_info.ra_column].to_numpy(),
-        dec=right_df[right_catalog_info.dec_column].to_numpy(),
-    )
-    # Pack arguments to the th_Cb subroutine
-    args = [
-        1,  # number of threads OpenMP
-        len(left_df),  # number of particles
-        left_df[left_catalog_info.ra_column].to_numpy(),  # RA of particles [deg]
-        left_df[left_catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
-        left_x,
-        left_y,
-        left_z,  # X,Y,Z coordinates of particles (see radec2xyz())
-        len(right_df),  # number of particles
-        right_x,
-        right_y,
-        right_z,  # X,Y,Z coordinates of particles (see radec2xyz())
-        params.nsept,  # Number of angular separation bins
-        bins,  # Bins in angular separation [deg]
-        params.sbound,
-        params.mxh1,
-        params.mxh2,
-        params.cntid,
-        params.logf,
-        params.sk1,
-        np.zeros(len(right_df)),  # ll1
-        params.grid,
-    ]
-    return cff.mod.th_C(*args)  # fast unweighted counting
+    try:
+        # Distance must be converted to cartesian space
+        left_x, left_y, left_z = project_coordinates(
+            ra=left_df[left_catalog_info.ra_column].to_numpy(),
+            dec=left_df[left_catalog_info.dec_column].to_numpy(),
+        )
+        right_x, right_y, right_z = project_coordinates(
+            ra=right_df[right_catalog_info.ra_column].to_numpy(),
+            dec=right_df[right_catalog_info.dec_column].to_numpy(),
+        )
+        # Pack arguments to the th_C subroutine
+        args = [
+            1,  # number of threads OpenMP
+            len(left_df),  # number of particles
+            left_df[left_catalog_info.ra_column].to_numpy(),  # RA of particles [deg]
+            left_df[left_catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
+            left_x,
+            left_y,
+            left_z,  # X,Y,Z coordinates of particles (see radec2xyz())
+            len(right_df),  # number of particles
+            right_x,
+            right_y,
+            right_z,  # X,Y,Z coordinates of particles (see radec2xyz())
+            params.nsept,  # Number of angular separation bins
+            bins,  # Bins in angular separation [deg]
+            params.sbound,
+            params.mxh1,
+            params.mxh2,
+            params.cntid,
+            params.logf,
+            params.sk1,
+            np.zeros(len(right_df)),  # ll1
+        ]
+        return cff.mod.th_C(*args)  # fast unweighted counting
+    except Exception as exception:
+        dask_print(exception)
+
+@dask.delayed
+def count_auto_pairs(
+    partition: pd.DataFrame,
+    catalog_info: CatalogInfo,
+    bins: np.ndarray,
+    params: Munch,
+) -> np.ndarray:
+    """Calls the fortran routine to compute the counts for each partition pair.
+
+    Args:
+       partition (pd.DataFrame): The partition dataframe.
+       catalog_info (CatalogInfo): The catalog metadata.
+       bins (np.ndarray): The separation bins, in angular space.
+       params (Munch): The gundam subroutine parameters.
+
+    Returns:
+       The delayed count histogram for the partition pair.
+    """
+    try:
+        # Distance must be converted to cartesian space
+        cart_x, cart_y, cart_z = project_coordinates(
+            ra=partition[catalog_info.ra_column].to_numpy(),
+            dec=partition[catalog_info.dec_column].to_numpy(),
+        )
+        # Pack arguments to the th_A subroutine
+        args = [
+            1,  # number of threads OpenMP
+            len(partition),  # number of particles
+            partition[catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
+            cart_x,
+            cart_y,
+            cart_z,  # X,Y,Z coordinates of particles (see radec2xyz())
+            params.nsept,  # Number of angular separation bins
+            bins,  # Bins in angular separation [deg]
+            params.sbound,
+            params.mxh1,
+            params.mxh2,
+            params.cntid,
+            "/home/delucchi/git/gundam/FORTRAN.log",
+            params.sk1,
+            np.zeros(len(partition)),  # ll
+        ]
+        return cff.mod.th_A(*args)  # fast unweighted counting
+    except Exception as exception:
+        dask_print(exception)
