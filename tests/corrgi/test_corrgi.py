@@ -12,7 +12,9 @@ from corrgi.parameters import create_gundam_params
 
 def test_acf1_bins_are_correct(acf1_bins_left_edges, acf1_bins_right_edges):
     params = create_gundam_params(kind="acf1", dsept=0.10, nsept=33, septmin=0.01)
-    bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
+    bins, _ = gundam.makebins(
+        params.nsept, params.septmin, params.dsept, params.logsept
+    )
     all_bins = np.append(acf1_bins_left_edges, acf1_bins_right_edges[-1])
     assert np.array_equal(all_bins, bins)
 
@@ -25,7 +27,9 @@ def test_acf1_counts_are_correct(
     random_catalog = lsdb.read_hipscat(rand_catalog_dir)
     assert isinstance(galaxy_catalog, lsdb.Catalog)
     assert isinstance(random_catalog, lsdb.Catalog)
-    counts_dd, counts_rr = compute_autocorrelation_counts(galaxy_catalog, random_catalog, params)
+    counts_dd, counts_rr = compute_autocorrelation_counts(
+        galaxy_catalog, random_catalog, params
+    )
     assert np.array_equal(counts_dd, acf1_dd_counts)
     assert np.array_equal(counts_rr, acf1_rr_counts)
 
@@ -41,7 +45,9 @@ def test_acf1_natural_estimate_is_correct(
     random_hc_catalog = hipscat.read_from_hipscat(rand_catalog_dir)
     num_galaxies = galaxy_hc_catalog.catalog_info.total_rows
     num_random = random_hc_catalog.catalog_info.total_rows
-    estimate = calculate_natural_estimate(acf1_dd_counts, acf1_rr_counts, num_galaxies, num_random)
+    estimate = calculate_natural_estimate(
+        acf1_dd_counts, acf1_rr_counts, num_galaxies, num_random
+    )
     assert np.array_equal(acf1_nat_estimate, estimate)
 
 

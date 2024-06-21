@@ -173,22 +173,13 @@ def count_auto_pairs(
         )
         # Pack arguments to the th_A subroutine
         args = [
-            1,  # number of threads OpenMP
             len(partition),  # number of particles
-            partition[catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
-            cart_x,
+            cart_x,  # X,Y,Z coordinates of particles (see radec2xyz())
             cart_y,
-            cart_z,  # X,Y,Z coordinates of particles (see radec2xyz())
+            cart_z,
             params.nsept,  # Number of angular separation bins
             bins,  # Bins in angular separation [deg]
-            params.sbound,
-            params.mxh1,
-            params.mxh2,
-            params.cntid,
-            "/home/delucchi/git/gundam/FORTRAN.log",
-            params.sk1,
-            np.zeros(len(partition)),  # ll
         ]
-        return cff.mod.th_A(*args)  # fast unweighted counting
+        return cff.mod.th_A_naiveway(*args)  # fast unweighted counting
     except Exception as exception:
         dask_print(exception)

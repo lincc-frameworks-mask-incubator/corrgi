@@ -2,22 +2,23 @@ import numpy as np
 from numpy import deg2rad
 
 
-def project_coordinates(ra: np.ndarray, dec: np.ndarray) -> np.ndarray:
+def project_coordinates(ra: np.ndarray, dec: np.ndarray, radius: float = 0.5) -> tuple[float, float, float]:
     """Project spherical coordinates (ra, dec) to cartesian space
     on a sphere of radius=0.5.
 
     Args:
         ra (np.ndarray): Right ascension, in radians.
         dec (np.ndarray): Declination, in radians.
+        radius (float): The radius of the sphere. Defaults to 0.5.
 
     Returns:
-        The coordinates, in cartesian space, on a sphere of radius=0.5.
+        The coordinates, in cartesian space, on a sphere of radius 0.5.
     """
     ra = np.radians(ra)
     dec = np.radians(dec)
-    x = 0.5 * np.cos(ra) * np.cos(dec)
-    y = 0.5 * np.cos(ra) * np.sin(dec)
-    z = 0.5 * np.sin(ra)
+    x = radius * np.cos(dec) * np.sin(ra)
+    y = radius * np.cos(dec) * np.cos(ra)
+    z = radius * np.sin(dec)
     return x, y, z
 
 

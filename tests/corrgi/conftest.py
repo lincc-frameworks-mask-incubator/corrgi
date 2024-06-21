@@ -10,7 +10,7 @@ from dask.distributed import Client
 @pytest.fixture(scope="session", name="dask_client")
 def dask_client():
     """Create a single client for use by all unit test cases."""
-    client = Client(n_workers=1, threads_per_worker=1)
+    client = Client(n_workers=3, threads_per_worker=1)
     yield client
     client.close()
 
