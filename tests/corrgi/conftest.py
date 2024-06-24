@@ -4,6 +4,7 @@ import gundam
 import numpy as np
 import pandas as pd
 import pytest
+from corrgi.parameters import create_gundam_params
 from dask.distributed import Client
 
 
@@ -73,23 +74,7 @@ def corr_bins():
 
 @pytest.fixture
 def autocorr_params():
-    params = gundam.packpars(kind="acf", write=False)
-
-    params.dsept = 0.10
-    params.nsept = 33
-    params.septmin = 0.01
-
-    params.kind = "thA"
-    params.cntid = "DD"
-    params.logf = "DD_log"
-
-    # Disable grid and fill some mock parameters
-    params.grid = 0
-    params.sbound = [1, 2, 1, 2]
-    params.mxh1 = 2
-    params.mxh2 = 2
-    params.sk1 = [[1, 2], [1, 2]]
-    return params
+    return create_gundam_params(kind="acf1", dsept=0.10, nsept=33, septmin=0.01)
 
 
 @pytest.fixture
