@@ -71,14 +71,12 @@ def perform_auto_counts(catalog: Catalog, *args) -> Delayed:
     alignment = autocorrelation_alignment(catalog.hc_structure)
     left_pixels, right_pixels = get_healpix_pixels_from_alignment(alignment)
     partials = align_and_apply([(catalog, left_pixels), (catalog, right_pixels)], count_pairs, *args)
-    print(partials)
     cross_hist = join_count_histograms(partials)
 
     partitions = catalog._ddf.to_delayed()
     partials = [
         count_auto_pairs(partition, catalog.hc_structure.catalog_info, *args) for partition in partitions
     ]
-    print(partials)
     auto_hist = join_count_histograms(partials)
     return join_count_histograms([cross_hist, auto_hist])
 
@@ -166,20 +164,32 @@ def count_auto_pairs(
        The delayed count histogram for the partition pair.
     """
     try:
-        # Distance must be converted to cartesian space
-        cart_x, cart_y, cart_z = project_coordinates(
-            ra=partition[catalog_info.ra_column].to_numpy(),
-            dec=partition[catalog_info.dec_column].to_numpy(),
-        )
-        # Pack arguments to the th_A subroutine
-        args = [
-            len(partition),  # number of particles
-            cart_x,  # X,Y,Z coordinates of particles (see radec2xyz())
-            cart_y,
-            cart_z,
-            params.nsept,  # Number of angular separation bins
-            bins,  # Bins in angular separation [deg]
-        ]
-        return cff.mod.th_A_naiveway(*args)  # fast unweighted counting
+        return _count_auto_pairs(partition, catalog_info, bins, params)
     except Exception as exception:
         dask_print(exception)
+
+
+def _count_auto_pairs(
+    partition: pd.DataFrame,
+    catalog_info: CatalogInfo,
+    bins: np.ndarray,
+    params: Munch,
+):
+    # Distance must be converted to cartesian space
+    cart_x, cart_y, cart_z = project_coordinates(
+        ra=partition[catalog_info.ra_column].to_numpy(),
+        dec=partition[catalog_info.dec_column].to_numpy(),
+    )
+    # Pack arguments to the th_A subroutine
+    args = [
+        len(partition),  # number of particles
+        cart_x,  # X,Y,Z coordinates of particles (see radec2xyz())
+        cart_y,
+        cart_z,
+        params.nsept,  # Number of angular separation bins
+        bins,  # Bins in angular separation [deg]
+    ]
+    counts = cff.mod.th_A_naiveway(*args)
+    dask_print("partition ", partition["Norder"].max(), partition["Npix"].max(), len(partition))
+    # dask_print(counts)
+    return counts  # fast unweighted counting

@@ -1,4 +1,5 @@
 import numpy as np
+from gundam import gundam
 from numpy import deg2rad
 
 
@@ -14,11 +15,7 @@ def project_coordinates(ra: np.ndarray, dec: np.ndarray, radius: float = 0.5) ->
     Returns:
         The coordinates, in cartesian space, on a sphere of radius 0.5.
     """
-    ra = np.radians(ra)
-    dec = np.radians(dec)
-    x = radius * np.cos(dec) * np.sin(ra)
-    y = radius * np.cos(dec) * np.cos(ra)
-    z = radius * np.sin(dec)
+    x, y, z = gundam.radec2xyz(ra * np.pi / 180.0, dec * np.pi / 180.0, r=radius)
     return x, y, z
 
 

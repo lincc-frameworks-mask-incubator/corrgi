@@ -17,6 +17,7 @@ def create_gundam_params(kind: str, **kwargs) -> Munch:
     params = gundam.packpars(kind=kind, write=False)
     # Disable grid and fill its unused parameters
     params.grid = 0
+    params.autogrid = False
     params.sbound = [1, 2, 1, 2]
     params.mxh1 = 2
     params.mxh2 = 2
