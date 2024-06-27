@@ -8,7 +8,7 @@ def calculate_natural_estimate(
     num_galaxies: int,
     num_random: int,
 ) -> np.ndarray:
-    """Calculates the auto-correlation value for a given estimator.
+    """Calculates the auto-correlation value for the natural estimator.
 
     Args:
         counts_dd (np.ndarray): The counts for the galaxy samples.

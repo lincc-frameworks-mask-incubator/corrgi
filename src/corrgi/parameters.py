@@ -5,7 +5,7 @@ from munch import Munch
 
 
 def create_gundam_params(kind: str, **kwargs) -> Munch:
-    """Generates the Gundam parameters for a specific kind.
+    """Generates the Gundam parameters for a specific kind of correlation function.
 
     Args:
         kind (str): The type of correlation function (e.g. acf).
@@ -37,17 +37,17 @@ def generate_dd_rr_params(params: Munch) -> tuple[Munch, Munch]:
     par_rr.kind = "thC"
     par_rr.cntid = "RR"
     par_rr.logf = "RR_log"
-    par_rr.wfib = False  # don't do fiber corrections in random counts
-    par_rr.doboot = False  # don't do bootstraping in random counts
+    par_rr.wfib = False
+    par_rr.doboot = False
     return par_dd, par_rr
 
 
 def generate_dr_params(params: Munch) -> Munch:
-    """Generate the DR parameters used int the cross-correlation."""
+    """Generate the DR parameters to be used in cross-correlation."""
     par_dr = deepcopy(params)
     par_dr.kind = "thC"
     par_dr.cntid = "DR"
     par_dr.logf = "DR_log"
-    par_dr.wfib = False  # don't do fiber corrections in crounts counts
-    par_dr.doboot = False  # don't do bootstraping in cross counts
+    par_dr.wfib = False
+    par_dr.doboot = False
     return par_dr

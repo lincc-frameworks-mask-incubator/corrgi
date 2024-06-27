@@ -11,6 +11,8 @@ def test_count_auto_pairs(
     autocorr_params,
 ):
     data_catalog = hipscat.read_from_hipscat(data_catalog_dir)
-    partial = _count_auto_pairs(single_data_partition, data_catalog.catalog_info, corr_bins, autocorr_params)
+    partial = _count_auto_pairs(
+        single_data_partition, data_catalog.catalog_info, corr_bins, autocorr_params
+    )
     print(partial)
     assert len(partial) == len(corr_bins) - 1
