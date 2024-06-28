@@ -14,5 +14,4 @@ def test_count_auto_pairs(
     partial = _count_auto_pairs(
         single_data_partition, data_catalog.catalog_info, corr_bins, autocorr_params
     )
-    print(partial)
     assert len(partial) == len(corr_bins) - 1

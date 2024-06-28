@@ -46,21 +46,6 @@ def dr7_lrg_rand_catalog_dir(test_data_dir):
 
 
 @pytest.fixture
-def w_acf_nat(test_data_dir):
-    return np.load(test_data_dir / "correlations" / "w_acf_nat.npy")
-
-
-@pytest.fixture
-def results_dir(test_data_dir):
-    return test_data_dir / "results"
-
-
-@pytest.fixture
-def w_acf_nat_true(test_data_dir):
-    return np.load(test_data_dir / "correlations" / "w_acf_nat_true.npy")
-
-
-@pytest.fixture
 def single_data_partition(data_catalog_dir):
     return pd.read_parquet(data_catalog_dir / "Norder=0" / "Dir=0" / "Npix=1.parquet")
 
@@ -75,7 +60,7 @@ def corr_bins():
 def autocorr_params():
     params = gundam.packpars(kind="acf", write=False)
 
-    params.dsept = 0.10
+    params.dsept = 0.1
     params.nsept = 33
     params.septmin = 0.01
 
@@ -93,25 +78,30 @@ def autocorr_params():
 
 
 @pytest.fixture
-def acf1_nat_estimate(results_dir):
-    return np.load(results_dir / "w_acf_nat.npy")
+def acf_results_dir(test_data_dir):
+    return test_data_dir / "acf"
 
 
 @pytest.fixture
-def acf1_dd_counts(results_dir):
-    return np.load(results_dir / "dd_acf.npy")
+def acf_bins_left_edges(acf_results_dir):
+    return np.load(acf_results_dir / "l_binedges_acf.npy")
 
 
 @pytest.fixture
-def acf1_rr_counts(results_dir):
-    return np.load(results_dir / "rr_acf.npy")
+def acf_bins_right_edges(acf_results_dir):
+    return np.load(acf_results_dir / "r_binedges_acf.npy")
 
 
 @pytest.fixture
-def acf1_bins_left_edges(results_dir):
-    return np.load(results_dir / "l_binedges_acf.npy")
+def acf_dd_counts(acf_results_dir):
+    return np.load(acf_results_dir / "dd_acf.npy")
 
 
 @pytest.fixture
-def acf1_bins_right_edges(results_dir):
-    return np.load(results_dir / "r_binedges_acf.npy")
+def acf_rr_counts(acf_results_dir):
+    return np.load(acf_results_dir / "rr_acf.npy")
+
+
+@pytest.fixture
+def acf_nat_estimate(acf_results_dir):
+    return np.load(acf_results_dir / "w_acf_nat.npy")
