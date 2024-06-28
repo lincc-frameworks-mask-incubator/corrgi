@@ -19,27 +19,20 @@ def autocorrelation_alignment(catalog: Catalog) -> PixelAlignment:
     """Determine all pairs of partitions that should be correlated within the same catalog.
 
     This considers all combinations, without duplicates between the "primary" and "join"
-    pixels in the alignment.
+    pixels in the alignment. It does not include the combinations of partitions with themselves.
 
     Args:
-        catalog (Catalog): catalog for autocorrelation
+        catalog (Catalog): catalog for auto-correlation.
+
     Returns:
-        alignment object where the `aligned` columns simply match the left pixel.
+        The alignment object where the `aligned` columns simply match the left pixel.
     """
     upper_triangle = [
         [left.order, left.pixel, right.order, right.pixel, left.order, left.pixel]
         for (left, right) in itertools.combinations(catalog.get_healpix_pixels(), 2)
     ]
     upper_triangle = pd.DataFrame(upper_triangle, columns=column_names)
-    diagonal = pd.DataFrame(
-        [
-            [pix.order, pix.pixel, pix.order, pix.pixel, pix.order, pix.pixel]
-            for pix in catalog.get_healpix_pixels()
-        ],
-        columns=column_names,
-    )
-    result_mapping = pd.concat([upper_triangle, diagonal])
-    return PixelAlignment(catalog.pixel_tree, result_mapping, PixelAlignmentType.OUTER)
+    return PixelAlignment(catalog.pixel_tree, upper_triangle, PixelAlignmentType.OUTER)
 
 
 def crosscorrelation_alignment(catalog_left: Catalog, catalog_right: Catalog) -> PixelAlignment:
@@ -48,10 +41,11 @@ def crosscorrelation_alignment(catalog_left: Catalog, catalog_right: Catalog) ->
     This considers the full cross-product of pixels.
 
     Args:
-        catalog_left (Catalog): left side of the cross-correlation
-        catalog_right (Catalog): right side of the cross-correlation
+        catalog_left (Catalog): left side of the cross-correlation.
+        catalog_right (Catalog): right side of the cross-correlation.
+
     Returns:
-        alignment object where the `aligned` columns simply match the left pixel.
+        The alignment object where the `aligned` columns simply match the left pixel.
     """
     full_product = [
         [left.order, left.pixel, right.order, right.pixel, left.order, left.pixel]
