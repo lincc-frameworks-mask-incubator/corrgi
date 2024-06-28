@@ -1,4 +1,3 @@
-import dask
 import hipscat
 
 from corrgi.dask import _count_auto_pairs
