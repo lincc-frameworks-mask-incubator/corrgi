@@ -21,28 +21,63 @@ def test_data_dir():
 
 
 @pytest.fixture
-def data_catalog_dir(test_data_dir):
-    return test_data_dir / "DATA"
+def hipscat_catalogs_dir(test_data_dir):
+    return test_data_dir / "hipscat"
 
 
 @pytest.fixture
-def rand_catalog_dir(test_data_dir):
-    return test_data_dir / "RAND"
+def acf_expected_results(test_data_dir):
+    return test_data_dir / "expected_results" / "acf"
 
 
 @pytest.fixture
-def raw_catalog_dir(test_data_dir):
-    return test_data_dir / "RAW"
+def pcf_expected_results(test_data_dir):
+    return test_data_dir / "expected_results" / "pcf"
 
 
 @pytest.fixture
-def dr7_lrg_catalog_dir(test_data_dir):
-    return test_data_dir / "DR7-lrg"
+def data_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "DATA"
 
 
 @pytest.fixture
-def dr7_lrg_rand_catalog_dir(test_data_dir):
-    return test_data_dir / "DR7-lrg-rand"
+def dr7_lrg_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "DR7-lrg"
+
+
+@pytest.fixture
+def dr7_lrg_rand_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "DR7-lrg-rand"
+
+
+@pytest.fixture
+def rand_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "RAND"
+
+
+@pytest.fixture
+def acf_bins_left_edges(acf_expected_results):
+    return np.load(acf_expected_results / "l_binedges_acf.npy")
+
+
+@pytest.fixture
+def acf_bins_right_edges(acf_expected_results):
+    return np.load(acf_expected_results / "r_binedges_acf.npy")
+
+
+@pytest.fixture
+def acf_dd_counts(acf_expected_results):
+    return np.load(acf_expected_results / "dd_acf.npy")
+
+
+@pytest.fixture
+def acf_rr_counts(acf_expected_results):
+    return np.load(acf_expected_results / "rr_acf.npy")
+
+
+@pytest.fixture
+def acf_nat_estimate(acf_expected_results):
+    return np.load(acf_expected_results / "w_acf_nat.npy")
 
 
 @pytest.fixture
@@ -75,33 +110,3 @@ def autocorr_params():
     params.mxh2 = 2
     params.sk1 = [[1, 2], [1, 2]]
     return params
-
-
-@pytest.fixture
-def acf_results_dir(test_data_dir):
-    return test_data_dir / "acf"
-
-
-@pytest.fixture
-def acf_bins_left_edges(acf_results_dir):
-    return np.load(acf_results_dir / "l_binedges_acf.npy")
-
-
-@pytest.fixture
-def acf_bins_right_edges(acf_results_dir):
-    return np.load(acf_results_dir / "r_binedges_acf.npy")
-
-
-@pytest.fixture
-def acf_dd_counts(acf_results_dir):
-    return np.load(acf_results_dir / "dd_acf.npy")
-
-
-@pytest.fixture
-def acf_rr_counts(acf_results_dir):
-    return np.load(acf_results_dir / "rr_acf.npy")
-
-
-@pytest.fixture
-def acf_nat_estimate(acf_results_dir):
-    return np.load(acf_results_dir / "w_acf_nat.npy")
