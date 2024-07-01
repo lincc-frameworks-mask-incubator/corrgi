@@ -4,7 +4,7 @@ import numpy as np
 import numpy.testing as npt
 from gundam import gundam
 
-from corrgi.correlation import AngularCorrelation
+from corrgi.correlation.angular_correlation import AngularCorrelation
 from corrgi.corrgi import compute_autocorrelation
 from corrgi.dask import compute_autocorrelation_counts
 from corrgi.estimators import calculate_natural_estimate

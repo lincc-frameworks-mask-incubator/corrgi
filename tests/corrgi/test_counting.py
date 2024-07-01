@@ -1,5 +1,6 @@
 import hipscat
-from corrgi.correlation import AngularCorrelation
+
+from corrgi.correlation.angular_correlation import AngularCorrelation
 
 
 def test_count_auto_pairs(
