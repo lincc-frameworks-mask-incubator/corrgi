@@ -31,11 +31,6 @@ def acf_expected_results(test_data_dir):
 
 
 @pytest.fixture
-def pcf_expected_results(test_data_dir):
-    return test_data_dir / "expected_results" / "pcf"
-
-
-@pytest.fixture
 def data_catalog_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "DATA"
 
