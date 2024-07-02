@@ -32,9 +32,11 @@ def compute_autocorrelation_counts(
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
     params_dd, params_rr = generate_dd_rr_params(params)
+    # Create correlation with bins and params
+    correlation = corr_type(bins, params)
     # Generate the histograms with counts for each catalog
-    counts_dd = perform_auto_counts(catalog, corr_type, bins, params_dd)
-    counts_rr = perform_auto_counts(random, corr_type, bins, params_rr)
+    counts_dd = perform_auto_counts(catalog, correlation)
+    counts_rr = perform_auto_counts(random, correlation)
     # Actually compute the results
     return dask.compute(*[counts_dd, counts_rr])
 
@@ -85,9 +87,7 @@ def perform_cross_counts(left: Catalog, right: Catalog, *args) -> np.ndarray:
 def count_auto_pairs(
     df: pd.DataFrame,
     catalog_info: CatalogInfo,
-    corr_type: type[Correlation],
-    bins: np.ndarray,
-    params: Munch,
+    correlation: Correlation,
 ) -> np.ndarray:
     """Calls the fortran routine to compute the counts for pairs of
     partitions belonging to the same catalog.
@@ -95,22 +95,13 @@ def count_auto_pairs(
     Args:
        df (pd.DataFrame): The partition dataframe.
        catalog_info (CatalogInfo): The catalog metadata.
-       corr_type (type[Correlation]): The correlation class.
-       bins (np.ndarray): The separation bins, in angular space.
-       params (Munch): The gundam subroutine parameters.
+       correlation (Correlation): The correlation instance.
 
     Returns:
        The count histogram for the partition pair.
     """
     try:
-        return corr_type(
-            df,
-            None,
-            catalog_info,
-            None,
-            bins,
-            params,
-        ).count_auto_pairs()
+        return correlation.count_auto_pairs(df, catalog_info)
     except Exception as exception:
         dask_print(exception)
 
@@ -123,9 +114,7 @@ def count_cross_pairs(
     right_pix: HealpixPixel,
     left_catalog_info: CatalogInfo,
     right_catalog_info: CatalogInfo,
-    corr_type: type[Correlation],
-    bins: np.ndarray,
-    params: Munch,
+    correlation: Correlation,
 ) -> np.ndarray:
     """Calls the fortran routine to compute the counts for pairs of
     partitions belonging to two different catalogs.
@@ -137,21 +126,17 @@ def count_cross_pairs(
        right_pix (HealpixPixel): The pixel corresponding to `right_df`.
        left_catalog_info (CatalogInfo): The left catalog metadata.
        right_catalog_info (CatalogInfo): The right catalog metadata.
-       corr_type (type[Correlation]): The correlation class.
-       bins (np.ndarray): The separation bins, in angular space.
-       params (Munch): The gundam subroutine parameters.
+       correlation (Correlation): The correlation instance.
 
     Returns:
        The count histogram for the partition pair.
     """
     try:
-        return corr_type(
+        return correlation.count_cross_pairs(
             left_df,
             right_df,
             left_catalog_info,
             right_catalog_info,
-            bins,
-            params,
-        ).count_cross_pairs()
+        )
     except Exception as exception:
         dask_print(exception)

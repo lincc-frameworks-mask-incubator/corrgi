@@ -16,45 +16,29 @@ class Correlation(ABC):
 
     def __init__(
         self,
-        left_df: pd.DataFrame,
-        right_df: pd.DataFrame | None,
-        left_catalog_info: CatalogInfo,
-        right_catalog_info: CatalogInfo | None,
         bins: np.ndarray,
         params: Munch,
         use_weights: bool = False,
     ):
-        self.left_df = left_df
-        self.right_df = right_df
-        self.left_catalog_info = left_catalog_info
-        self.right_catalog_info = right_catalog_info
         self.bins = bins
         self.params = params
         self.use_weights = use_weights
 
-    def get_left_coords(self) -> tuple[float, float, float]:
-        """Calculate the cartesian coordinates for the left partition"""
-        return project_coordinates(
-            ra=self.left_df[self.left_catalog_info.ra_column].to_numpy(),
-            dec=self.left_df[self.left_catalog_info.dec_column].to_numpy(),
-        )
-
-    def get_right_coords(self) -> tuple[float, float, float]:
-        """Calculate the cartesian coordinates for the right partition"""
-        return project_coordinates(
-            ra=self.right_df[self.right_catalog_info.ra_column].to_numpy(),
-            dec=self.right_df[self.right_catalog_info.dec_column].to_numpy(),
-        )
-
-    def count_auto_pairs(self) -> np.ndarray:
+    def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:
         """Computes the counts for pairs of the same partition"""
-        auto_method = self._get_auto_method()
-        return auto_method(*self._construct_auto_args())
+        args = self._construct_auto_args(df, catalog_info)
+        return self._get_auto_method()(*args)
 
-    def count_cross_pairs(self) -> np.ndarray:
+    def count_cross_pairs(
+        self,
+        left_df: pd.DataFrame,
+        right_df: pd.DataFrame,
+        left_catalog_info: CatalogInfo,
+        right_catalog_info: CatalogInfo,
+    ) -> np.ndarray:
         """Computes the counts for pairs of different partitions"""
-        cross_method = self._get_cross_method()
-        return cross_method(*self._construct_cross_args())
+        args = self._construct_cross_args(left_df, right_df, left_catalog_info, right_catalog_info)
+        return self._get_cross_method()(*args)
 
     @abstractmethod
     def _get_auto_method(self) -> Callable:
@@ -62,7 +46,7 @@ class Correlation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def _construct_auto_args(self) -> list:
+    def _construct_auto_args(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> list:
         """Generate the arguments required for the auto pairing method"""
         raise NotImplementedError()
 
@@ -72,6 +56,18 @@ class Correlation(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def _construct_cross_args(self) -> list:
+    def _construct_cross_args(
+        self,
+        left_df: pd.DataFrame,
+        right_df: pd.DataFrame,
+        left_catalog_info: CatalogInfo,
+        righ_catalog_info: CatalogInfo,
+    ) -> list:
         """Generate the arguments required for the cross pairing method"""
         raise NotImplementedError()
+
+    def get_coords(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> tuple[float, float, float]:
+        """Calculate the cartesian coordinates for the points in the partition"""
+        return project_coordinates(
+            ra=df[catalog_info.ra_column].to_numpy(), dec=df[catalog_info.dec_column].to_numpy()
+        )
