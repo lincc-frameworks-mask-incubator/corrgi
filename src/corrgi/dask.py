@@ -1,5 +1,4 @@
 import dask
-import gundam.cflibfor as cff
 import numpy as np
 import pandas as pd
 from dask.distributed import print as dask_print
@@ -11,14 +10,17 @@ from lsdb.dask.merge_catalog_functions import align_and_apply, get_healpix_pixel
 from munch import Munch
 
 from corrgi.alignment import autocorrelation_alignment, crosscorrelation_alignment
-from corrgi.parameters import generate_dd_rr_params
-from corrgi.utils import join_count_histograms, project_coordinates
+from corrgi.correlation.correlation import Correlation
+from corrgi.utils import join_count_histograms
 
 
-def compute_autocorrelation_counts(catalog: Catalog, random: Catalog, params: Munch) -> np.ndarray:
+def compute_autocorrelation_counts(
+    corr_type: type[Correlation], catalog: Catalog, random: Catalog, params: Munch
+) -> np.ndarray:
     """Computes the auto-correlation counts for a catalog.
 
     Args:
+        corr_type (type[Correlation]): The correlation class.
         catalog (Catalog): The catalog with galaxy samples.
         random (Catalog): The catalog with random samples.
         params (dict): The gundam parameters for the Fortran subroutine.
@@ -28,11 +30,11 @@ def compute_autocorrelation_counts(catalog: Catalog, random: Catalog, params: Mu
     """
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
-    params_dd, params_rr = generate_dd_rr_params(params)
+    # Create correlation with bins and params
+    correlation = corr_type(bins, params)
     # Generate the histograms with counts for each catalog
-    counts_dd = perform_auto_counts(catalog, bins, params_dd)
-    counts_rr = perform_auto_counts(random, bins, params_rr)
-    # Actually compute the results
+    counts_dd = perform_auto_counts(catalog, correlation)
+    counts_rr = perform_auto_counts(random, correlation)
     return dask.compute(*[counts_dd, counts_rr])
 
 
@@ -82,8 +84,7 @@ def perform_cross_counts(left: Catalog, right: Catalog, *args) -> np.ndarray:
 def count_auto_pairs(
     df: pd.DataFrame,
     catalog_info: CatalogInfo,
-    bins: np.ndarray,
-    params: Munch,
+    correlation: Correlation,
 ) -> np.ndarray:
     """Calls the fortran routine to compute the counts for pairs of
     partitions belonging to the same catalog.
@@ -91,16 +92,16 @@ def count_auto_pairs(
     Args:
        df (pd.DataFrame): The partition dataframe.
        catalog_info (CatalogInfo): The catalog metadata.
-       bins (np.ndarray): The separation bins, in angular space.
-       params (Munch): The gundam subroutine parameters.
+       correlation (Correlation): The correlation instance.
 
     Returns:
        The count histogram for the partition pair.
     """
     try:
-        return _count_auto_pairs(df, catalog_info, bins, params)
+        return correlation.count_auto_pairs(df, catalog_info)
     except Exception as exception:
         dask_print(exception)
+        raise exception
 
 
 @dask.delayed
@@ -111,8 +112,7 @@ def count_cross_pairs(
     right_pix: HealpixPixel,
     left_catalog_info: CatalogInfo,
     right_catalog_info: CatalogInfo,
-    bins: np.ndarray,
-    params: Munch,
+    correlation: Correlation,
 ) -> np.ndarray:
     """Calls the fortran routine to compute the counts for pairs of
     partitions belonging to two different catalogs.
@@ -124,86 +124,18 @@ def count_cross_pairs(
        right_pix (HealpixPixel): The pixel corresponding to `right_df`.
        left_catalog_info (CatalogInfo): The left catalog metadata.
        right_catalog_info (CatalogInfo): The right catalog metadata.
-       bins (np.ndarray): The separation bins, in angular space.
-       params (Munch): The gundam subroutine parameters.
+       correlation (Correlation): The correlation instance.
 
     Returns:
        The count histogram for the partition pair.
     """
     try:
-        return _count_cross_pairs(
+        return correlation.count_cross_pairs(
             left_df,
             right_df,
             left_catalog_info,
             right_catalog_info,
-            bins,
-            params,
         )
     except Exception as exception:
         dask_print(exception)
-
-
-def _count_auto_pairs(
-    df: pd.DataFrame,
-    catalog_info: CatalogInfo,
-    bins: np.ndarray,
-    params: Munch,
-) -> np.ndarray:
-    x, y, z = project_coordinates(
-        ra=df[catalog_info.ra_column].to_numpy(),
-        dec=df[catalog_info.dec_column].to_numpy(),
-    )
-    args = [
-        len(df),  # number of particles
-        x,
-        y,
-        z,  # X,Y,Z coordinates of particles
-        params.nsept,  # number of angular separation bins
-        bins,  # bins in angular separation [deg]
-    ]
-    counts = cff.mod.th_A_naiveway(*args)  # fast unweighted counting
-    return counts
-
-
-def _count_cross_pairs(
-    left_df: pd.DataFrame,
-    right_df: pd.DataFrame,
-    left_catalog_info: CatalogInfo,
-    right_catalog_info: CatalogInfo,
-    bins: np.ndarray,
-    params: Munch,
-) -> np.ndarray:
-    left_x, left_y, left_z = project_coordinates(
-        ra=left_df[left_catalog_info.ra_column].to_numpy(),
-        dec=left_df[left_catalog_info.dec_column].to_numpy(),
-    )
-    right_x, right_y, right_z = project_coordinates(
-        ra=right_df[right_catalog_info.ra_column].to_numpy(),
-        dec=right_df[right_catalog_info.dec_column].to_numpy(),
-    )
-    args = [
-        1,  # number of threads OpenMP
-        len(left_df),  # number of particles of the left partition
-        left_df[left_catalog_info.ra_column].to_numpy(),  # RA of particles [deg]
-        left_df[left_catalog_info.dec_column].to_numpy(),  # DEC of particles [deg]
-        left_x,
-        left_y,
-        left_z,  # X,Y,Z coordinates of particles
-        len(right_df),  # number of particles of the right partition
-        right_x,
-        right_y,
-        right_z,  # X,Y,Z coordinates of particles
-        params.nsept,  # number of angular separation bins
-        bins,  # bins in angular separation [deg]
-        params.sbound,
-        params.mxh1,
-        params.mxh2,
-        params.cntid,
-        params.logf,
-        params.sk1,
-        np.zeros(len(right_df)),
-        params.grid,
-    ]
-    # TODO: Create gundam th_C_naive_way that accepts only the necessary arguments
-    counts = cff.mod.th_C(*args)  # fast unweighted counting
-    return counts
+        raise exception
