@@ -12,7 +12,7 @@ class RedshiftCorrelation(Correlation):
     def _get_auto_method(self) -> Callable:
         raise NotImplementedError()
 
-    def _construct_auto_args(self, df: pd.DataFrame) -> list:
+    def _construct_auto_args(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> list:
         raise NotImplementedError()
 
     def _get_cross_method(self) -> Callable:
@@ -23,6 +23,6 @@ class RedshiftCorrelation(Correlation):
         left_df: pd.DataFrame,
         right_df: pd.DataFrame,
         left_catalog_info: CatalogInfo,
-        righ_catalog_info: CatalogInfo,
+        right_catalog_info: CatalogInfo,
     ) -> list:
         raise NotImplementedError()

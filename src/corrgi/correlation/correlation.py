@@ -61,7 +61,7 @@ class Correlation(ABC):
         left_df: pd.DataFrame,
         right_df: pd.DataFrame,
         left_catalog_info: CatalogInfo,
-        righ_catalog_info: CatalogInfo,
+        right_catalog_info: CatalogInfo,
     ) -> list:
         """Generate the arguments required for the cross pairing method"""
         raise NotImplementedError()
