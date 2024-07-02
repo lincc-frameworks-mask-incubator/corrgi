@@ -12,6 +12,7 @@ def compute_autocorrelation(
     catalog: Catalog,
     random: Catalog,
     params: Munch,
+    use_weights: bool = False,
 ) -> np.ndarray:
     """Calculates the auto-correlation for a catalog.
 
@@ -21,13 +22,16 @@ def compute_autocorrelation(
         catalog (Catalog): The catalog.
         random (Catalog): A random samples catalog.
         params (Munch): The parameters dictionary to run gundam with.
+        use_weights (bool): Whether to use weights or not. Defaults to False.
 
     Returns:
         A numpy array with the result of the auto-correlation, using the natural estimator.
     """
+    if use_weights and "wei" not in catalog.columns:
+        raise ValueError("No weight columns in catalog")
     num_galaxies = catalog.hc_structure.catalog_info.total_rows
     num_random = random.hc_structure.catalog_info.total_rows
-    counts_dd, counts_rr = compute_autocorrelation_counts(corr_type, catalog, random, params)
+    counts_dd, counts_rr = compute_autocorrelation_counts(corr_type, catalog, random, params, use_weights)
     return calculate_natural_estimate(counts_dd, counts_rr, num_galaxies, num_random)
 
 

@@ -23,6 +23,7 @@ class Correlation(ABC):
         self.bins = bins
         self.params = params
         self.use_weights = use_weights
+        self.nbins = len(bins) - 1
 
     def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:
         """Computes the counts for pairs of the same partition"""

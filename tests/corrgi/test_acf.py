@@ -70,3 +70,26 @@ def test_acf_e2e(
         AngularCorrelation, galaxy_catalog, random_catalog, autocorr_params
     )
     npt.assert_allclose(estimate, acf_nat_estimate, rtol=1e-7)
+
+
+def test_acf_counts_with_weights_are_correct(
+    dask_client,
+    acf_gals_weight_dir,
+    acf_rans_weight_dir,
+    acf_dd_counts_with_weights,
+    acf_rr_counts_with_weights,
+    autocorr_params,
+):
+    galaxy_catalog = lsdb.read_hipscat(acf_gals_weight_dir)
+    random_catalog = lsdb.read_hipscat(acf_rans_weight_dir)
+    assert isinstance(galaxy_catalog, lsdb.Catalog)
+    assert isinstance(random_catalog, lsdb.Catalog)
+    counts_dd, counts_rr = compute_autocorrelation_counts(
+        AngularCorrelation,
+        galaxy_catalog,
+        random_catalog,
+        autocorr_params,
+        use_weights=True,
+    )
+    npt.assert_allclose(counts_dd, acf_dd_counts_with_weights, rtol=1e-3)
+    npt.assert_allclose(counts_rr, acf_rr_counts_with_weights, rtol=2e-3)
