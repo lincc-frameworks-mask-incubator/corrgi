@@ -11,7 +11,6 @@ from munch import Munch
 
 from corrgi.alignment import autocorrelation_alignment, crosscorrelation_alignment
 from corrgi.correlation.correlation import Correlation
-from corrgi.parameters import generate_dd_rr_params
 from corrgi.utils import join_count_histograms
 
 
@@ -31,13 +30,11 @@ def compute_autocorrelation_counts(
     """
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
-    params_dd, params_rr = generate_dd_rr_params(params)
     # Create correlation with bins and params
     correlation = corr_type(bins, params)
     # Generate the histograms with counts for each catalog
     counts_dd = perform_auto_counts(catalog, correlation)
     counts_rr = perform_auto_counts(random, correlation)
-    # Actually compute the results
     return dask.compute(*[counts_dd, counts_rr])
 
 
@@ -104,6 +101,7 @@ def count_auto_pairs(
         return correlation.count_auto_pairs(df, catalog_info)
     except Exception as exception:
         dask_print(exception)
+        raise exception
 
 
 @dask.delayed
@@ -140,3 +138,4 @@ def count_cross_pairs(
         )
     except Exception as exception:
         dask_print(exception)
+        raise exception

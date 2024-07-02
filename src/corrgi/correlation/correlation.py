@@ -66,7 +66,8 @@ class Correlation(ABC):
         """Generate the arguments required for the cross pairing method"""
         raise NotImplementedError()
 
-    def get_coords(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> tuple[float, float, float]:
+    @staticmethod
+    def get_coords(df: pd.DataFrame, catalog_info: CatalogInfo) -> tuple[float, float, float]:
         """Calculate the cartesian coordinates for the points in the partition"""
         return project_coordinates(
             ra=df[catalog_info.ra_column].to_numpy(), dec=df[catalog_info.dec_column].to_numpy()
