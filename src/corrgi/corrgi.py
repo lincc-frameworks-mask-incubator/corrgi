@@ -4,7 +4,7 @@ from munch import Munch
 
 from corrgi.correlation.correlation import Correlation
 from corrgi.dask import compute_autocorrelation_counts
-from corrgi.estimators import calculate_natural_estimate
+from corrgi.estimators import calculate_tpcf
 
 
 def compute_autocorrelation(
@@ -25,10 +25,10 @@ def compute_autocorrelation(
     Returns:
         A numpy array with the result of the auto-correlation, using the natural estimator.
     """
-    num_galaxies = catalog.hc_structure.catalog_info.total_rows
+    num_particles = catalog.hc_structure.catalog_info.total_rows
     num_random = random.hc_structure.catalog_info.total_rows
     counts_dd, counts_rr = compute_autocorrelation_counts(corr_type, catalog, random, params)
-    return calculate_natural_estimate(counts_dd, counts_rr, num_galaxies, num_random)
+    return calculate_tpcf(counts_dd, counts_rr, num_particles, num_random)
 
 
 def compute_crosscorrelation(left: Catalog, right: Catalog, random: Catalog, params: Munch) -> np.ndarray:

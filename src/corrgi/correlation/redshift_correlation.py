@@ -9,6 +9,10 @@ from corrgi.correlation.correlation import Correlation
 class RedshiftCorrelation(Correlation):
     """The redshift correlation utilities."""
 
+    def make_bins(self):
+        """Generate bins for the correlation"""
+        raise NotImplementedError()
+
     def _get_auto_method(self) -> Callable:
         raise NotImplementedError()
 

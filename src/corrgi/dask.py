@@ -31,7 +31,7 @@ def compute_autocorrelation_counts(
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
     # Create correlation with bins and params
-    correlation = corr_type(bins, params)
+    correlation = corr_type(params)
     # Generate the histograms with counts for each catalog
     counts_dd = perform_auto_counts(catalog, correlation)
     counts_rr = perform_auto_counts(random, correlation)

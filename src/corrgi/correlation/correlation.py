@@ -14,13 +14,7 @@ from corrgi.utils import project_coordinates
 class Correlation(ABC):
     """Correlation base class."""
 
-    def __init__(
-        self,
-        bins: np.ndarray,
-        params: Munch,
-        use_weights: bool = False,
-    ):
-        self.bins = bins
+    def __init__(self, params: Munch, use_weights: bool = False):
         self.params = params
         self.use_weights = use_weights
 
@@ -39,6 +33,11 @@ class Correlation(ABC):
         """Computes the counts for pairs of different partitions"""
         args = self._construct_cross_args(left_df, right_df, left_catalog_info, right_catalog_info)
         return self._get_cross_method()(*args)
+
+    @abstractmethod
+    def make_bins(self):
+        """Generate bins for the correlation"""
+        raise NotImplementedError()
 
     @abstractmethod
     def _get_auto_method(self) -> Callable:
