@@ -2,7 +2,6 @@ import dask
 import numpy as np
 import pandas as pd
 from dask.distributed import print as dask_print
-from gundam import gundam
 from hipscat.catalog.catalog_info import CatalogInfo
 from hipscat.pixel_math import HealpixPixel
 from lsdb import Catalog
@@ -28,9 +27,7 @@ def compute_autocorrelation_counts(
     Returns:
         The histogram counts to calculate the auto-correlation.
     """
-    # Calculate the angular separation bins
-    bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
-    # Create correlation with bins and params
+    # Create correlation with params
     correlation = corr_type(params)
     # Generate the histograms with counts for each catalog
     counts_dd = perform_auto_counts(catalog, correlation)

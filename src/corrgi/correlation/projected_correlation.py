@@ -1,6 +1,7 @@
 from typing import Callable
 
 import gundam.cflibfor as cff
+import numpy as np
 import pandas as pd
 from astropy.cosmology import LambdaCDM
 from gundam import gundam
@@ -15,6 +16,7 @@ class ProjectedCorrelation(Correlation):
 
     def __init__(self, params: Munch, use_weights: bool = False):
         super().__init__(params, use_weights)
+        self.cosmo = LambdaCDM(H0=params.h0, Om0=params.omegam, Ode0=params.omegal)
         self.sepp, self.sepv = self.make_bins()
 
     def make_bins(self) -> tuple[list]:
@@ -25,10 +27,9 @@ class ProjectedCorrelation(Correlation):
         sepv, _ = gundam.makebins(self.params.nsepv, 0.0, self.params.dsepv, False)
         return sepp, sepv
 
-    def calculate_comoving_distances(self, df: pd.DataFrame):
+    def calculate_comoving_distances(self, df: pd.DataFrame) -> np.ndarray:
         """Calculate the comoving distances from the redshift of each particle"""
-        cosmo = LambdaCDM(H0=self.params.h0, Om0=self.params.omegam, Ode0=self.params.omegal)
-        return cosmo.comoving_distance(df["z"]).value
+        return self.cosmo.comoving_distance(df["z"].to_numpy()).value
 
     def _get_auto_method(self) -> Callable:
         return cff.mod.rppi_A_wg_naiveway if self.use_weights else cff.mod.rppi_A_naiveway
@@ -48,7 +49,7 @@ class ProjectedCorrelation(Correlation):
         return args
 
     def _get_cross_method(self) -> Callable:
-        raise cff.mod.rppi_C_wg_naiveway if self.use_weights else cff.mod.rppi_C_naiveway
+        return cff.mod.rppi_C_wg_naiveway if self.use_weights else cff.mod.rppi_C_naiveway
 
     def _construct_cross_args(
         self,

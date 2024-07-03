@@ -10,14 +10,12 @@ from corrgi.dask import compute_autocorrelation_counts
 from corrgi.estimators import calculate_tpcf
 
 
-def test_acf_bins_are_correct(
-    acf_bins_left_edges, acf_bins_right_edges, autocorr_params
-):
+def test_acf_bins_are_correct(acf_bins_left_edges, acf_bins_right_edges, acf_params):
     bins, _ = gundam.makebins(
-        autocorr_params.nsept,
-        autocorr_params.septmin,
-        autocorr_params.dsept,
-        autocorr_params.logsept,
+        acf_params.nsept,
+        acf_params.septmin,
+        acf_params.dsept,
+        acf_params.logsept,
     )
     all_bins = np.append(acf_bins_left_edges, acf_bins_right_edges[-1])
     assert np.array_equal(bins, all_bins)
@@ -29,14 +27,14 @@ def test_acf_counts_are_correct(
     rand_catalog_dir,
     acf_dd_counts,
     acf_rr_counts,
-    autocorr_params,
+    acf_params,
 ):
     galaxy_catalog = lsdb.read_hipscat(data_catalog_dir)
     random_catalog = lsdb.read_hipscat(rand_catalog_dir)
     assert isinstance(galaxy_catalog, lsdb.Catalog)
     assert isinstance(random_catalog, lsdb.Catalog)
     counts_dd, counts_rr = compute_autocorrelation_counts(
-        AngularCorrelation, galaxy_catalog, random_catalog, autocorr_params
+        AngularCorrelation, galaxy_catalog, random_catalog, acf_params
     )
     npt.assert_allclose(counts_dd, acf_dd_counts, rtol=1e-3)
     npt.assert_allclose(counts_rr, acf_rr_counts, rtol=2e-3)
@@ -58,13 +56,13 @@ def test_acf_natural_estimate_is_correct(
 
 
 def test_acf_e2e(
-    dask_client, data_catalog_dir, rand_catalog_dir, acf_nat_estimate, autocorr_params
+    dask_client, data_catalog_dir, rand_catalog_dir, acf_nat_estimate, acf_params
 ):
     galaxy_catalog = lsdb.read_hipscat(data_catalog_dir)
     random_catalog = lsdb.read_hipscat(rand_catalog_dir)
     assert isinstance(galaxy_catalog, lsdb.Catalog)
     assert isinstance(random_catalog, lsdb.Catalog)
     estimate = compute_autocorrelation(
-        AngularCorrelation, galaxy_catalog, random_catalog, autocorr_params
+        AngularCorrelation, galaxy_catalog, random_catalog, acf_params
     )
     npt.assert_allclose(estimate, acf_nat_estimate, rtol=1e-7)

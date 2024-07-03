@@ -31,6 +31,11 @@ def acf_expected_results(test_data_dir):
 
 
 @pytest.fixture
+def pcf_expected_results(test_data_dir):
+    return test_data_dir / "expected_results" / "pcf"
+
+
+@pytest.fixture
 def data_catalog_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "DATA"
 
@@ -71,6 +76,16 @@ def acf_rr_counts(acf_expected_results):
 
 
 @pytest.fixture
+def pcf_dd_counts(pcf_expected_results):
+    return np.load(pcf_expected_results / "dd_pcf.npy")
+
+
+@pytest.fixture
+def pcf_rr_counts(pcf_expected_results):
+    return np.load(pcf_expected_results / "rr_pcf.npy")
+
+
+@pytest.fixture
 def acf_nat_estimate(acf_expected_results):
     return np.load(acf_expected_results / "w_acf_nat.npy")
 
@@ -81,27 +96,29 @@ def single_data_partition(data_catalog_dir):
 
 
 @pytest.fixture
-def corr_bins():
+def acf_corr_bins():
     bins, _ = gundam.makebins(33, 0.01, 0.1, 1)
     return bins
 
 
 @pytest.fixture
-def autocorr_params():
-    params = gundam.packpars(kind="acf", write=False)
-
+def acf_params():
+    params = gundam.packpars(kind="acf")
     params.dsept = 0.1
     params.nsept = 33
     params.septmin = 0.01
+    return params
 
-    params.kind = "thA"
-    params.cntid = "DD"
-    params.logf = "DD_log"
 
-    # Disable grid and fill some mock parameters
-    params.grid = 0
-    params.sbound = [1, 2, 1, 2]
-    params.mxh1 = 2
-    params.mxh2 = 2
-    params.sk1 = [[1, 2], [1, 2]]
+@pytest.fixture
+def pcf_params():
+    params = gundam.packpars(kind="pcf")
+    params.nsepp = 28  # Number of bins of projected separation rp
+    params.seppmin = 0.02  # Minimum rp in Mpc/h
+    params.dsepp = 0.12  # Bin size of rp (in log space)
+    params.nsepv = 1  # Number of bins of LOS separation pi
+    params.dsepv = 40.0  # Bin size of pi (in linear space)
+    params.omegam = 0.25  # Omega matter
+    params.omegal = 0.75  # Omega lambda
+    params.h0 = 100  # Hubble constant [km/s/Mpc]
     return params
