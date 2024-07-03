@@ -19,5 +19,5 @@ def test_pcf_counts_are_correct(
     counts_dd, counts_rr = compute_autocorrelation_counts(
         ProjectedCorrelation, galaxy_catalog, random_catalog, pcf_params
     )
-    npt.assert_allclose(counts_dd, pcf_dd_counts, rtol=1e-3)
-    npt.assert_allclose(counts_rr, pcf_rr_counts, rtol=2e-3)
+    npt.assert_allclose(counts_dd.transpose([1, 0]), pcf_dd_counts, rtol=1e-3)
+    npt.assert_allclose(counts_rr.transpose([1, 0]), pcf_rr_counts, rtol=2e-3)

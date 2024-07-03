@@ -64,7 +64,7 @@ class ProjectedCorrelation(Correlation):
             *self.get_coords(left_df, left_catalog_info),
             len(right_df),
             self.calculate_comoving_distances(right_df),
-            *self.get_coords(right_df, left_catalog_info),
+            *self.get_coords(right_df, right_catalog_info),
             self.params.nsepp,
             self.sepp,
             self.params.nsepv,
