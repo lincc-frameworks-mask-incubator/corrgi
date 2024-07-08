@@ -14,8 +14,14 @@ from corrgi.utils import project_coordinates
 class Correlation(ABC):
     """Correlation base class."""
 
-    def __init__(self, params: Munch, use_weights: bool = False):
+    def __init__(
+        self,
+        params: Munch,
+        weight_column: str = "wei",
+        use_weights: bool = False,
+    ):
         self.params = params
+        self.weight_column = weight_column
         self.use_weights = use_weights
 
     def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:

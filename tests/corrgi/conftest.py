@@ -56,6 +56,16 @@ def rand_catalog_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
+def acf_gals_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "acf_gals_weight"
+
+
+@pytest.fixture
+def acf_rans_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "acf_rans_weight"
+
+
+@pytest.fixture
 def acf_bins_left_edges(acf_expected_results):
     return np.load(acf_expected_results / "l_binedges_acf.npy")
 
@@ -73,6 +83,16 @@ def acf_dd_counts(acf_expected_results):
 @pytest.fixture
 def acf_rr_counts(acf_expected_results):
     return np.load(acf_expected_results / "rr_acf.npy")
+
+
+@pytest.fixture
+def acf_dd_counts_with_weights(acf_expected_results):
+    return np.load(acf_expected_results / "dd_acf_weight.npy")
+
+
+@pytest.fixture
+def acf_rr_counts_with_weights(acf_expected_results):
+    return np.load(acf_expected_results / "rr_acf_weight.npy")
 
 
 @pytest.fixture
