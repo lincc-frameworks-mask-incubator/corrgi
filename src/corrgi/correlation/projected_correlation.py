@@ -71,5 +71,5 @@ class ProjectedCorrelation(Correlation):
             self.sepv,
         ]
         if self.use_weights:
-            args = [*args[:2], left_df["wei"], *args[2:5], right_df["wei"], *args[5:]]
+            args = [*args[:2], left_df["wei"].to_numpy(), *args[2:7], right_df["wei"].to_numpy(), *args[7:]]
         return args
