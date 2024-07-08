@@ -14,7 +14,7 @@ from corrgi.correlation.correlation import Correlation
 class ProjectedCorrelation(Correlation):
     """The projected correlation utilities."""
 
-    def __init__(self, params: Munch, use_weights: bool = False):
+    def __init__(self, params: Munch, use_weights: bool = True):
         super().__init__(params, use_weights)
         self.cosmo = LambdaCDM(H0=params.h0, Om0=params.omegam, Ode0=params.omegal)
         self.sepp, self.sepv = self.make_bins()

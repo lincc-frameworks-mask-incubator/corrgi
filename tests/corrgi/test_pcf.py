@@ -21,3 +21,26 @@ def test_pcf_counts_are_correct(
     )
     npt.assert_allclose(counts_dd.transpose([1, 0]), pcf_dd_counts, rtol=1e-3)
     npt.assert_allclose(counts_rr.transpose([1, 0]), pcf_rr_counts, rtol=2e-3)
+
+
+def test_pcf_counts_with_weights_are_correct(
+    dask_client,
+    pcf_gals_weight_dir,
+    pcf_rans_weight_dir,
+    pcf_dd_counts_with_weights,
+    pcf_rr_counts_with_weights,
+    pcf_params,
+):
+    galaxy_catalog = lsdb.read_hipscat(pcf_gals_weight_dir)
+    random_catalog = lsdb.read_hipscat(pcf_rans_weight_dir)
+    assert isinstance(galaxy_catalog, lsdb.Catalog)
+    assert isinstance(random_catalog, lsdb.Catalog)
+    counts_dd, counts_rr = compute_autocorrelation_counts(
+        ProjectedCorrelation, galaxy_catalog, random_catalog, pcf_params
+    )
+    npt.assert_allclose(
+        counts_dd.transpose([1, 0]), pcf_dd_counts_with_weights, rtol=1e-3
+    )
+    npt.assert_allclose(
+        counts_rr.transpose([1, 0]), pcf_rr_counts_with_weights, rtol=2e-3
+    )
