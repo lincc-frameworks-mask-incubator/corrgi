@@ -24,7 +24,7 @@ class AngularCorrelation(Correlation):
             self.bins,  # bins in angular separation [deg]
         ]
         if self.use_weights:
-            args = [args[0], df["wei"].to_numpy(), *args[1:]]
+            args = [args[0], df[self.weight_column].to_numpy(), *args[1:]]
         return args
 
     def _construct_cross_args(
@@ -43,5 +43,11 @@ class AngularCorrelation(Correlation):
             self.bins,  # bins in angular separation [deg]
         ]
         if self.use_weights:
-            args = [args[0], left_df["wei"].to_numpy(), *args[1:5], right_df["wei"].to_numpy(), *args[5:]]
+            args = [
+                args[0],
+                left_df[self.weight_column].to_numpy(),
+                *args[1:5],
+                right_df[self.weight_column].to_numpy(),
+                *args[5:],
+            ]
         return args
