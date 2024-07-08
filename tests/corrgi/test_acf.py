@@ -101,7 +101,7 @@ def test_acf_weights_not_provided(data_catalog_dir, rand_catalog_dir, autocorr_p
     random_catalog = lsdb.read_hipscat(rand_catalog_dir)
     assert isinstance(galaxy_catalog, lsdb.Catalog)
     assert isinstance(random_catalog, lsdb.Catalog)
-    with pytest.raises(ValueError, match="No weight columns in catalog"):
+    with pytest.raises(ValueError, match="does not exist"):
         compute_autocorrelation(
             AngularCorrelation,
             galaxy_catalog,

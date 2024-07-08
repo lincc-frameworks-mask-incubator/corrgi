@@ -15,7 +15,12 @@ from corrgi.utils import join_count_histograms
 
 
 def compute_autocorrelation_counts(
-    corr_type: type[Correlation], catalog: Catalog, random: Catalog, params: Munch, use_weights: bool = False
+    corr_type: type[Correlation],
+    catalog: Catalog,
+    random: Catalog,
+    params: Munch,
+    weight_column: str = "wei",
+    use_weights: bool = False,
 ) -> np.ndarray:
     """Computes the auto-correlation counts for a catalog.
 
@@ -24,6 +29,7 @@ def compute_autocorrelation_counts(
         catalog (Catalog): The catalog with galaxy samples.
         random (Catalog): The catalog with random samples.
         params (dict): The gundam parameters for the Fortran subroutine.
+        weight_column (str): The weights column name. Defaults to "wei".
         use_weights (bool): Whether to use weights or not. Defaults to False.
 
     Returns:
@@ -32,7 +38,7 @@ def compute_autocorrelation_counts(
     # Calculate the angular separation bins
     bins, _ = gundam.makebins(params.nsept, params.septmin, params.dsept, params.logsept)
     # Create correlation with bins and params
-    correlation = corr_type(bins, params, use_weights)
+    correlation = corr_type(bins, params, weight_column, use_weights)
     # Generate the histograms with counts for each catalog
     counts_dd = perform_auto_counts(catalog, correlation)
     counts_rr = perform_auto_counts(random, correlation)
