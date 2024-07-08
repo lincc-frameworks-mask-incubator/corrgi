@@ -7,7 +7,7 @@ from gundam import gundam
 from corrgi.correlation.angular_correlation import AngularCorrelation
 from corrgi.corrgi import compute_autocorrelation
 from corrgi.dask import compute_autocorrelation_counts
-from corrgi.estimators import calculate_tpcf
+from corrgi.estimators import calculate_natural_estimate
 
 
 def test_acf_bins_are_correct(acf_bins_left_edges, acf_bins_right_edges, acf_params):
@@ -51,7 +51,9 @@ def test_acf_natural_estimate_is_correct(
     random_hc_catalog = hipscat.read_from_hipscat(rand_catalog_dir)
     num_galaxies = galaxy_hc_catalog.catalog_info.total_rows
     num_random = random_hc_catalog.catalog_info.total_rows
-    estimate = calculate_tpcf(acf_dd_counts, acf_rr_counts, num_galaxies, num_random)
+    estimate = calculate_natural_estimate(
+        acf_dd_counts, acf_rr_counts, num_galaxies, num_random
+    )
     npt.assert_allclose(acf_nat_estimate, estimate, rtol=2e-3)
 
 
