@@ -20,7 +20,7 @@ class AngularCorrelation(Correlation):
         args = [
             len(df),
             *self.get_coords(df, catalog_info),  # cartesian coordinates
-            self.nbins,  # number of angular separation bins
+            self.params.nsept,  # number of angular separation bins
             self.bins,  # bins in angular separation [deg]
         ]
         if self.use_weights:
@@ -39,7 +39,7 @@ class AngularCorrelation(Correlation):
             *self.get_coords(left_df, left_catalog_info),  # X,Y,Z coordinates of particles
             len(right_df),  # number of particles of the right partition
             *self.get_coords(right_df, right_catalog_info),  # X,Y,Z coordinates of particles
-            self.nbins,  # number of angular separation bins
+            self.params.nsept,  # number of angular separation bins
             self.bins,  # bins in angular separation [deg]
         ]
         if self.use_weights:
