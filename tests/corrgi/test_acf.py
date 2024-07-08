@@ -2,6 +2,7 @@ import hipscat
 import lsdb
 import numpy as np
 import numpy.testing as npt
+import pytest
 from gundam import gundam
 
 from corrgi.correlation.angular_correlation import AngularCorrelation
@@ -93,3 +94,18 @@ def test_acf_counts_with_weights_are_correct(
     )
     npt.assert_allclose(counts_dd, acf_dd_counts_with_weights, rtol=1e-3)
     npt.assert_allclose(counts_rr, acf_rr_counts_with_weights, rtol=2e-3)
+
+
+def test_acf_weights_not_provided(data_catalog_dir, rand_catalog_dir, autocorr_params):
+    galaxy_catalog = lsdb.read_hipscat(data_catalog_dir)
+    random_catalog = lsdb.read_hipscat(rand_catalog_dir)
+    assert isinstance(galaxy_catalog, lsdb.Catalog)
+    assert isinstance(random_catalog, lsdb.Catalog)
+    with pytest.raises(ValueError, match="No weight columns in catalog"):
+        compute_autocorrelation(
+            AngularCorrelation,
+            galaxy_catalog,
+            random_catalog,
+            autocorr_params,
+            use_weights=True,
+        )
