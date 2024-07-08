@@ -18,10 +18,12 @@ class Correlation(ABC):
         self,
         bins: np.ndarray,
         params: Munch,
+        weight_column: str = "wei",
         use_weights: bool = False,
     ):
         self.bins = bins
         self.params = params
+        self.weight_column = weight_column
         self.use_weights = use_weights
 
     def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:
