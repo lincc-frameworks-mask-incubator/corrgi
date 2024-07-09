@@ -6,9 +6,8 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 from hipscat.catalog.catalog_info import CatalogInfo
-from munch import Munch
-
 from lsdb import Catalog
+from munch import Munch
 
 from corrgi.utils import project_coordinates
 
@@ -26,7 +25,7 @@ class Correlation(ABC):
         self.weight_column = weight_column
         self.use_weights = use_weights
 
-    def validate(self, catalogs: List[Catalog]):
+    def validate(self, catalogs: list[Catalog]):
         """Validate that the correlation args/data are valid"""
         if not self.use_weights:
             return

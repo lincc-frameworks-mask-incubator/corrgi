@@ -2,15 +2,16 @@ from typing import Callable
 
 import pandas as pd
 from hipscat.catalog.catalog_info import CatalogInfo
+from lsdb import Catalog
 
 from corrgi.correlation.correlation import Correlation
-from lsdb import Catalog
 
 
 class RedshiftCorrelation(Correlation):
     """The redshift correlation utilities."""
 
     def validate(self, catalogs: list[Catalog]):
+        """Validate that the correlation args/data are valid"""
         super().validate(catalogs)
 
     def make_bins(self):

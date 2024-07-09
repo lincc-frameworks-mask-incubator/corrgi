@@ -6,8 +6,8 @@ import pandas as pd
 from astropy.cosmology import LambdaCDM
 from gundam import gundam
 from hipscat.catalog.catalog_info import CatalogInfo
-from munch import Munch
 from lsdb import Catalog
+from munch import Munch
 
 from corrgi.correlation.correlation import Correlation
 
@@ -28,7 +28,8 @@ class ProjectedCorrelation(Correlation):
         self.cosmo = LambdaCDM(H0=params.h0, Om0=params.omegam, Ode0=params.omegal)
 
     def validate(self, catalogs: list[Catalog]):
-        super().validate_cross_correlation(catalogs)
+        """Validate that the correlation args/data are valid"""
+        super().validate(catalogs)
         for catalog in catalogs:
             if self.redshift_column not in catalog.columns:
                 raise ValueError(f"Redshift column {self.redshift_column} not found in {catalog}")

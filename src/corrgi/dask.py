@@ -6,7 +6,6 @@ from hipscat.catalog.catalog_info import CatalogInfo
 from hipscat.pixel_math import HealpixPixel
 from lsdb import Catalog
 from lsdb.dask.merge_catalog_functions import align_and_apply, get_healpix_pixels_from_alignment
-from munch import Munch
 
 from corrgi.alignment import autocorrelation_alignment, crosscorrelation_alignment
 from corrgi.correlation.correlation import Correlation
