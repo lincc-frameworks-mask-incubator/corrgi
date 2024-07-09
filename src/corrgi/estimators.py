@@ -1,5 +1,5 @@
 import numpy as np
-from gundam import tpcf, tpccf
+from gundam import tpccf, tpcf
 
 
 def calculate_tpcf(

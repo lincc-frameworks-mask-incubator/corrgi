@@ -1,10 +1,9 @@
 import numpy as np
 from lsdb import Catalog
-from munch import Munch
 
 from corrgi.correlation.correlation import Correlation
-from corrgi.dask import compute_autocorrelation_counts
-from corrgi.estimators import calculate_tpcf, calculate_tpccf
+from corrgi.dask import compute_autocorrelation_counts, compute_crosscorrelation_counts
+from corrgi.estimators import calculate_tpccf, calculate_tpcf
 
 
 def compute_autocorrelation(
@@ -47,7 +46,7 @@ def compute_crosscorrelation(
         A numpy array with the result of the cross-correlation, using the natural estimator.
     """
     correlation = corr_type(**kwargs)
-    correlation.validate([catalog, random])
+    correlation.validate([left, right, random])
     counts_cd, counts_cr = compute_crosscorrelation_counts(left, right, random, correlation)
     num_particles = left.hc_structure.catalog_info.total_rows
     num_random = random.hc_structure.catalog_info.total_rows
