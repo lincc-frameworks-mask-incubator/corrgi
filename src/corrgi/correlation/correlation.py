@@ -6,6 +6,7 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 from hipscat.catalog.catalog_info import CatalogInfo
+from lsdb import Catalog
 from munch import Munch
 
 from corrgi.utils import project_coordinates
@@ -16,15 +17,24 @@ class Correlation(ABC):
 
     def __init__(
         self,
-        bins: np.ndarray,
         params: Munch,
         weight_column: str = "wei",
         use_weights: bool = False,
     ):
-        self.bins = bins
         self.params = params
         self.weight_column = weight_column
         self.use_weights = use_weights
+
+    def validate(self, catalogs: list[Catalog]):
+        """Validate that the correlation args/data are valid"""
+        if not self.use_weights:
+            return
+        for catalog in catalogs:
+            if self.weight_column not in catalog.columns:
+                raise ValueError(
+                    f"Weight column '{self.weight_column}' does not exist"
+                    + f" in {catalog.hc_structure.catalog_info.catalog_name}"
+                )
 
     def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:
         """Computes the counts for pairs of the same partition"""
@@ -41,6 +51,11 @@ class Correlation(ABC):
         """Computes the counts for pairs of different partitions"""
         args = self._construct_cross_args(left_df, right_df, left_catalog_info, right_catalog_info)
         return self._get_cross_method()(*args)
+
+    @abstractmethod
+    def make_bins(self):
+        """Generate bins for the correlation"""
+        raise NotImplementedError()
 
     @abstractmethod
     def _get_auto_method(self) -> Callable:
