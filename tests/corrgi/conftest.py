@@ -37,6 +37,11 @@ def pcf_expected_results(test_data_dir):
 
 
 @pytest.fixture
+def pccf_expected_results(test_data_dir):
+    return test_data_dir / "expected_results" / "pccf"
+
+
+@pytest.fixture
 def data_catalog_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "DATA"
 
@@ -117,6 +122,21 @@ def acf_rr_counts_with_weights(acf_expected_results):
 
 
 @pytest.fixture
+def pcf_gals_weight_catalog(hipscat_catalogs_dir):
+    return lsdb.read_hipscat(hipscat_catalogs_dir / "pcf_gals_weight")
+
+
+@pytest.fixture
+def pcf_gals1_weight_catalog(hipscat_catalogs_dir):
+    return lsdb.read_hipscat(hipscat_catalogs_dir / "pcf_gals1_weight")
+
+
+@pytest.fixture
+def pcf_rans_weight_catalog(hipscat_catalogs_dir):
+    return lsdb.read_hipscat(hipscat_catalogs_dir / "pcf_rans_weight")
+
+
+@pytest.fixture
 def pcf_dd_counts(pcf_expected_results):
     return np.load(pcf_expected_results / "dd_pcf.npy")
 
@@ -124,6 +144,16 @@ def pcf_dd_counts(pcf_expected_results):
 @pytest.fixture
 def pcf_rr_counts(pcf_expected_results):
     return np.load(pcf_expected_results / "rr_pcf.npy")
+
+
+@pytest.fixture
+def pccf_cd_counts(pccf_expected_results):
+    return np.load(pccf_expected_results / "cd_pccf_weight.npy")
+
+
+@pytest.fixture
+def pccf_cr_counts(pccf_expected_results):
+    return np.load(pccf_expected_results / "cr_pccf_weight.npy")
 
 
 @pytest.fixture
