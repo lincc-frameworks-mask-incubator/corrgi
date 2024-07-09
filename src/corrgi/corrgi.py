@@ -8,26 +8,25 @@ from corrgi.estimators import calculate_natural_estimate
 
 
 def compute_autocorrelation(
-    corr_type: type[Correlation],
-    catalog: Catalog,
-    random: Catalog,
-    params: Munch,
+    catalog: Catalog, random: Catalog, corr_type: type[Correlation], **kwargs
 ) -> np.ndarray:
     """Calculates the auto-correlation for a catalog.
 
     Args:
-        corr_type (type[Correlation]): The corrgi class corresponding to the type of
-            correlation (AngularCorrelation, RedshiftCorrelation, or ProjectedCorrelation).
         catalog (Catalog): The catalog.
         random (Catalog): A random samples catalog.
-        params (Munch): The parameters dictionary to run gundam with.
+        corr_type (type[Correlation]): The corrgi class corresponding to the type of
+            correlation (AngularCorrelation, RedshiftCorrelation, or ProjectedCorrelation).
+        **kwargs (dict): The arguments for the creation of the correlation instance.
 
     Returns:
         A numpy array with the result of the auto-correlation, using the natural estimator.
     """
+    correlation = corr_type(**kwargs)
+    correlation.validate([catalog, random])
+    counts_dd, counts_rr = compute_autocorrelation_counts(catalog, random, correlation)
     num_galaxies = catalog.hc_structure.catalog_info.total_rows
     num_random = random.hc_structure.catalog_info.total_rows
-    counts_dd, counts_rr = compute_autocorrelation_counts(corr_type, catalog, random, params)
     return calculate_natural_estimate(counts_dd, counts_rr, num_galaxies, num_random)
 
 

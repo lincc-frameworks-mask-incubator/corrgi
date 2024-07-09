@@ -1,46 +1,45 @@
-import lsdb
+import pytest
 from corrgi.correlation.projected_correlation import ProjectedCorrelation
+from corrgi.corrgi import compute_autocorrelation
 from corrgi.dask import compute_autocorrelation_counts
 import numpy.testing as npt
 
 
 def test_pcf_counts_are_correct(
-    dask_client,
-    data_catalog_dir,
-    rand_catalog_dir,
-    pcf_dd_counts,
-    pcf_rr_counts,
-    pcf_params,
+    dask_client, data_catalog, rand_catalog, pcf_dd_counts, pcf_rr_counts, pcf_params
 ):
-    galaxy_catalog = lsdb.read_hipscat(data_catalog_dir)
-    random_catalog = lsdb.read_hipscat(rand_catalog_dir)
-    assert isinstance(galaxy_catalog, lsdb.Catalog)
-    assert isinstance(random_catalog, lsdb.Catalog)
+    proj_corr = ProjectedCorrelation(params=pcf_params)
     counts_dd, counts_rr = compute_autocorrelation_counts(
-        ProjectedCorrelation, galaxy_catalog, random_catalog, pcf_params
+        data_catalog, rand_catalog, proj_corr
     )
-    npt.assert_allclose(counts_dd.transpose([1, 0]), pcf_dd_counts, rtol=1e-3)
-    npt.assert_allclose(counts_rr.transpose([1, 0]), pcf_rr_counts, rtol=2e-3)
+    expected_dd, expected_rr = counts_dd.transpose([1, 0]), counts_rr.transpose([1, 0])
+    npt.assert_allclose(expected_dd, pcf_dd_counts, rtol=1e-3)
+    npt.assert_allclose(expected_rr, pcf_rr_counts, rtol=2e-3)
 
 
 def test_pcf_counts_with_weights_are_correct(
     dask_client,
-    pcf_gals_weight_dir,
-    pcf_rans_weight_dir,
+    pcf_gals_weight_catalog,
+    pcf_rans_weight_catalog,
     pcf_dd_counts_with_weights,
     pcf_rr_counts_with_weights,
     pcf_params,
 ):
-    galaxy_catalog = lsdb.read_hipscat(pcf_gals_weight_dir)
-    random_catalog = lsdb.read_hipscat(pcf_rans_weight_dir)
-    assert isinstance(galaxy_catalog, lsdb.Catalog)
-    assert isinstance(random_catalog, lsdb.Catalog)
+    proj_corr = ProjectedCorrelation(params=pcf_params, use_weights=True)
     counts_dd, counts_rr = compute_autocorrelation_counts(
-        ProjectedCorrelation, galaxy_catalog, random_catalog, pcf_params
+        pcf_gals_weight_catalog, pcf_rans_weight_catalog, proj_corr
     )
-    npt.assert_allclose(
-        counts_dd.transpose([1, 0]), pcf_dd_counts_with_weights, rtol=1e-3
-    )
-    npt.assert_allclose(
-        counts_rr.transpose([1, 0]), pcf_rr_counts_with_weights, rtol=2e-3
-    )
+    expected_dd, expected_rr = counts_dd.transpose([1, 0]), counts_rr.transpose([1, 0])
+    npt.assert_allclose(expected_dd, pcf_dd_counts_with_weights, rtol=1e-3)
+    npt.assert_allclose(expected_rr, pcf_rr_counts_with_weights, rtol=2e-3)
+
+
+def test_pcf_catalog_has_no_redshift(data_catalog, rand_catalog, pcf_params):
+    with pytest.raises(ValueError, match="ph_z not found"):
+        compute_autocorrelation(
+            data_catalog,
+            rand_catalog,
+            ProjectedCorrelation,
+            params=pcf_params,
+            redshift_column="ph_z",
+        )
