@@ -8,6 +8,8 @@ import pandas as pd
 from hipscat.catalog.catalog_info import CatalogInfo
 from munch import Munch
 
+from lsdb import Catalog
+
 from corrgi.utils import project_coordinates
 
 
@@ -23,6 +25,17 @@ class Correlation(ABC):
         self.params = params
         self.weight_column = weight_column
         self.use_weights = use_weights
+
+    def validate(self, catalogs: List[Catalog]):
+        """Validate that the correlation args/data are valid"""
+        if not self.use_weights:
+            return
+        for catalog in catalogs:
+            if self.weight_column not in catalog.columns:
+                raise ValueError(
+                    f"Weight column '{self.weight_column}' does not exist"
+                    + f" in {catalog.hc_structure.catalog_info.catalog_name}"
+                )
 
     def count_auto_pairs(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> np.ndarray:
         """Computes the counts for pairs of the same partition"""

@@ -7,6 +7,7 @@ from astropy.cosmology import LambdaCDM
 from gundam import gundam
 from hipscat.catalog.catalog_info import CatalogInfo
 from munch import Munch
+from lsdb import Catalog
 
 from corrgi.correlation.correlation import Correlation
 
@@ -14,10 +15,23 @@ from corrgi.correlation.correlation import Correlation
 class ProjectedCorrelation(Correlation):
     """The projected correlation utilities."""
 
-    def __init__(self, params: Munch, weight_column: str = "wei", use_weights: bool = False):
+    def __init__(
+        self,
+        params: Munch,
+        weight_column: str = "wei",
+        redshift_column: str = "z",
+        use_weights: bool = False,
+    ):
         super().__init__(params, weight_column, use_weights)
-        self.cosmo = LambdaCDM(H0=params.h0, Om0=params.omegam, Ode0=params.omegal)
+        self.redshift_column = redshift_column
         self.sepp, self.sepv = self.make_bins()
+        self.cosmo = LambdaCDM(H0=params.h0, Om0=params.omegam, Ode0=params.omegal)
+
+    def validate(self, catalogs: list[Catalog]):
+        super().validate_cross_correlation(catalogs)
+        for catalog in catalogs:
+            if self.redshift_column not in catalog.columns:
+                raise ValueError(f"Redshift column {self.redshift_column} not found in {catalog}")
 
     def make_bins(self) -> tuple[list]:
         """Generate bins of projected separation and LOS for the correlation"""
@@ -29,7 +43,7 @@ class ProjectedCorrelation(Correlation):
 
     def calculate_comoving_distances(self, df: pd.DataFrame) -> np.ndarray:
         """Calculate the comoving distances from the redshift of each particle"""
-        return self.cosmo.comoving_distance(df["z"].to_numpy()).value
+        return self.cosmo.comoving_distance(df[self.redshift_column].to_numpy()).value
 
     def _get_auto_method(self) -> Callable:
         return cff.mod.rppi_A_wg_naiveway if self.use_weights else cff.mod.rppi_A_naiveway
@@ -45,7 +59,7 @@ class ProjectedCorrelation(Correlation):
             self.sepv,  # Bins in radial separation
         ]
         if self.use_weights:
-            args = [*args[:2], df["wei"].to_numpy(), *args[2:]]
+            args = [*args[:2], df[self.weight_column].to_numpy(), *args[2:]]
         return args
 
     def _get_cross_method(self) -> Callable:
@@ -71,5 +85,11 @@ class ProjectedCorrelation(Correlation):
             self.sepv,
         ]
         if self.use_weights:
-            args = [*args[:2], left_df["wei"].to_numpy(), *args[2:7], right_df["wei"].to_numpy(), *args[7:]]
+            args = [
+                *args[:2],
+                left_df[self.weight_column].to_numpy(),
+                *args[2:7],
+                right_df[self.weight_column].to_numpy(),
+                *args[7:],
+            ]
         return args

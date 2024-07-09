@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import gundam
+import lsdb
 import numpy as np
 import pandas as pd
 import pytest
@@ -41,13 +42,8 @@ def data_catalog_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
-def dr7_lrg_catalog_dir(hipscat_catalogs_dir):
-    return hipscat_catalogs_dir / "DR7-lrg"
-
-
-@pytest.fixture
-def dr7_lrg_rand_catalog_dir(hipscat_catalogs_dir):
-    return hipscat_catalogs_dir / "DR7-lrg-rand"
+def data_catalog(data_catalog_dir):
+    return lsdb.read_hipscat(data_catalog_dir)
 
 
 @pytest.fixture
@@ -56,13 +52,38 @@ def rand_catalog_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
-def acf_gals_weight_dir(hipscat_catalogs_dir):
-    return hipscat_catalogs_dir / "acf_gals_weight"
+def rand_catalog(rand_catalog_dir):
+    return lsdb.read_hipscat(rand_catalog_dir)
 
 
 @pytest.fixture
-def acf_rans_weight_dir(hipscat_catalogs_dir):
-    return hipscat_catalogs_dir / "acf_rans_weight"
+def dr7_lrg_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "DR7-lrg"
+
+
+@pytest.fixture
+def dr7_lrg_catalog(dr7_lrg_catalog_dir):
+    return lsdb.read_hipscat(dr7_lrg_catalog_dir)
+
+
+@pytest.fixture
+def dr7_lrg_rand_catalog_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "DR7-lrg-rand"
+
+
+@pytest.fixture
+def dr7_lrg_rand_catalog(dr7_lrg_rand_catalog_dir):
+    return lsdb.read_hipscat(dr7_lrg_rand_catalog_dir)
+
+
+@pytest.fixture
+def acf_gals_weight_catalog(hipscat_catalogs_dir):
+    return lsdb.read_hipscat(hipscat_catalogs_dir / "acf_gals_weight")
+
+
+@pytest.fixture
+def acf_rans_weight_catalog(hipscat_catalogs_dir):
+    return lsdb.read_hipscat(hipscat_catalogs_dir / "acf_rans_weight")
 
 
 @pytest.fixture
