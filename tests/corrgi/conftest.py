@@ -132,6 +132,11 @@ def acf_nat_estimate(acf_expected_results):
 
 
 @pytest.fixture
+def pcf_nat_estimate(pcf_expected_results):
+    return np.load(pcf_expected_results / "w_pcf_nat.npy")
+
+
+@pytest.fixture
 def single_data_partition(data_catalog_dir):
     return pd.read_parquet(data_catalog_dir / "Norder=0" / "Dir=0" / "Npix=1.parquet")
 

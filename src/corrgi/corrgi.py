@@ -3,8 +3,7 @@ from lsdb import Catalog
 from munch import Munch
 
 from corrgi.correlation.correlation import Correlation
-from corrgi.dask import compute_autocorrelation_counts
-from corrgi.estimators import calculate_natural_estimate
+from corrgi.estimators.estimator_factory import get_estimator_for_correlation
 
 
 def compute_autocorrelation(
@@ -24,10 +23,8 @@ def compute_autocorrelation(
     """
     correlation = corr_type(**kwargs)
     correlation.validate([catalog, random])
-    counts_dd, counts_rr = compute_autocorrelation_counts(catalog, random, correlation)
-    num_galaxies = catalog.hc_structure.catalog_info.total_rows
-    num_random = random.hc_structure.catalog_info.total_rows
-    return calculate_natural_estimate(counts_dd, counts_rr, num_galaxies, num_random)
+    estimator = get_estimator_for_correlation(correlation)
+    return estimator.compute_auto_estimate(catalog, random)
 
 
 def compute_crosscorrelation(left: Catalog, right: Catalog, random: Catalog, params: Munch) -> np.ndarray:
