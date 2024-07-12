@@ -87,6 +87,26 @@ def acf_rans_weight_catalog(hipscat_catalogs_dir):
 
 
 @pytest.fixture
+def pcf_gals_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "pcf_gals_weight"
+
+
+@pytest.fixture
+def pcf_gals_weight_catalog(pcf_gals_weight_dir):
+    return lsdb.read_hipscat(pcf_gals_weight_dir)
+
+
+@pytest.fixture
+def pcf_rans_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "pcf_rans_weight"
+
+
+@pytest.fixture
+def pcf_rans_weight_catalog(pcf_rans_weight_dir):
+    return lsdb.read_hipscat(pcf_rans_weight_dir)
+
+
+@pytest.fixture
 def acf_bins_left_edges(acf_expected_results):
     return np.load(acf_expected_results / "l_binedges_acf.npy")
 
@@ -124,6 +144,16 @@ def pcf_dd_counts(pcf_expected_results):
 @pytest.fixture
 def pcf_rr_counts(pcf_expected_results):
     return np.load(pcf_expected_results / "rr_pcf.npy")
+
+
+@pytest.fixture
+def pcf_dd_counts_with_weights(pcf_expected_results):
+    return np.load(pcf_expected_results / "dd_pcf_weight.npy")
+
+
+@pytest.fixture
+def pcf_rr_counts_with_weights(pcf_expected_results):
+    return np.load(pcf_expected_results / "rr_pcf_weight.npy")
 
 
 @pytest.fixture

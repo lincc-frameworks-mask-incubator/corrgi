@@ -17,6 +17,23 @@ def test_pcf_counts_are_correct(
     npt.assert_allclose(expected_rr, pcf_rr_counts, rtol=2e-3)
 
 
+def test_pcf_counts_with_weights_are_correct(
+    dask_client,
+    pcf_gals_weight_catalog,
+    pcf_rans_weight_catalog,
+    pcf_dd_counts_with_weights,
+    pcf_rr_counts_with_weights,
+    pcf_params,
+):
+    proj_corr = ProjectedCorrelation(params=pcf_params, use_weights=True)
+    counts_dd, counts_rr = compute_autocorrelation_counts(
+        pcf_gals_weight_catalog, pcf_rans_weight_catalog, proj_corr
+    )
+    expected_dd, expected_rr = counts_dd.transpose([1, 0]), counts_rr.transpose([1, 0])
+    npt.assert_allclose(expected_dd, pcf_dd_counts_with_weights, rtol=1e-3)
+    npt.assert_allclose(expected_rr, pcf_rr_counts_with_weights, rtol=2e-3)
+
+
 def test_pcf_catalog_has_no_redshift(data_catalog, rand_catalog, pcf_params):
     with pytest.raises(ValueError, match="ph_z not found"):
         compute_autocorrelation(

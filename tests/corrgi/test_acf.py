@@ -22,12 +22,7 @@ def test_acf_bins_are_correct(acf_bins_left_edges, acf_bins_right_edges, acf_par
 
 
 def test_acf_counts_are_correct(
-    dask_client,
-    data_catalog,
-    rand_catalog,
-    acf_dd_counts,
-    acf_rr_counts,
-    acf_params,
+    dask_client, data_catalog, rand_catalog, acf_dd_counts, acf_rr_counts, acf_params
 ):
     ang_corr = AngularCorrelation(params=acf_params)
     counts_dd, counts_rr = compute_autocorrelation_counts(
@@ -38,11 +33,7 @@ def test_acf_counts_are_correct(
 
 
 def test_acf_natural_estimate_is_correct(
-    data_catalog_dir,
-    rand_catalog_dir,
-    acf_dd_counts,
-    acf_rr_counts,
-    acf_nat_estimate,
+    data_catalog_dir, rand_catalog_dir, acf_dd_counts, acf_rr_counts, acf_nat_estimate
 ):
     galaxy_hc_catalog = hipscat.read_from_hipscat(data_catalog_dir)
     random_hc_catalog = hipscat.read_from_hipscat(rand_catalog_dir)
