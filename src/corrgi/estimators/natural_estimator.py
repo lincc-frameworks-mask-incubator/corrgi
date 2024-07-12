@@ -15,8 +15,7 @@ class NaturalEstimator(Estimator):
         counts_dd = perform_auto_counts(catalog, self.correlation)
         counts_rr = perform_auto_counts(random, self.correlation)
         counts = dask.compute(*[counts_dd, counts_rr])
-        counts_dd, counts_rr = self.correlation.transform_counts(counts)
-        return [counts_dd, counts_rr]
+        return self.correlation.transform_counts(counts)
 
     def _get_auto_args(
         self, counts_dd: np.ndarray, counts_rr: np.ndarray, num_galaxies: int, num_random: int
