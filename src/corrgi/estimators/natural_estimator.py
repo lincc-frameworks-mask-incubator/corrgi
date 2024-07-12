@@ -10,13 +10,20 @@ from corrgi.estimators.estimator import Estimator
 class NaturalEstimator(Estimator):
     """Natural Estimator (`DD/RR - 1`)"""
 
-    def _get_auto_args(self, catalog: Catalog, random: Catalog) -> list:
+    def compute_autocorrelation_counts(self, catalog: Catalog, random: Catalog) -> list[np.ndarray]:
+        """Computes the auto-correlation counts for the provided catalog"""
+        counts_dd = perform_auto_counts(catalog, self.correlation)
+        counts_rr = perform_auto_counts(random, self.correlation)
+        counts = dask.compute(*[counts_dd, counts_rr])
+        counts_dd, counts_rr = self.correlation.transform_counts(counts)
+        return [counts_dd, counts_rr]
+
+    def _get_auto_args(
+        self, counts_dd: np.ndarray, counts_rr: np.ndarray, num_galaxies: int, num_random: int
+    ) -> list:
         """Returns the args for the auto-correlation estimator subroutine"""
-        num_galaxies = catalog.hc_structure.catalog_info.total_rows
-        num_random = random.hc_structure.catalog_info.total_rows
-        counts_dd, counts_rr = self.compute_autocorrelation_counts(catalog, random)
-        counts_dr = 0
-        bdd = np.zeros([len(counts_dd), 0])
+        bdd = self.correlation.get_bdd_counts()
+        counts_dr = 0  # The natural estimator does not use DR counts
         args = [
             num_galaxies,
             num_random,
@@ -29,9 +36,3 @@ class NaturalEstimator(Estimator):
         if isinstance(self.correlation, ProjectedCorrelation):
             args = [*args[:6], self.correlation.params.dsepv, args[-1]]
         return args
-
-    def compute_autocorrelation_counts(self, catalog: Catalog, random: Catalog) -> list[np.ndarray]:
-        """Computes the auto-correlation counts for the provided catalog"""
-        counts_dd = perform_auto_counts(catalog, self.correlation)
-        counts_rr = perform_auto_counts(random, self.correlation)
-        return dask.compute(*[counts_dd, counts_rr])

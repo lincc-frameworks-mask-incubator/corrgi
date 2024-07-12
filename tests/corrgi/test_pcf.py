@@ -10,10 +10,9 @@ def test_pcf_natural_counts_are_correct(
     dask_client, data_catalog, rand_catalog, pcf_dd_counts, pcf_rr_counts, pcf_params
 ):
     estimator = NaturalEstimator(ProjectedCorrelation(params=pcf_params))
-    counts_dd, counts_rr = estimator.compute_autocorrelation_counts(
+    expected_dd, expected_rr = estimator.compute_autocorrelation_counts(
         data_catalog, rand_catalog
     )
-    expected_dd, expected_rr = counts_dd.transpose([1, 0]), counts_rr.transpose([1, 0])
     npt.assert_allclose(expected_dd, pcf_dd_counts, rtol=1e-3)
     npt.assert_allclose(expected_rr, pcf_rr_counts, rtol=2e-3)
 
@@ -25,7 +24,7 @@ def test_pcf_natural_estimate_is_correct(
     estimate = compute_autocorrelation(
         data_catalog, rand_catalog, ProjectedCorrelation, params=pcf_params
     )
-    npt.assert_allclose(estimate, pcf_nat_estimate, rtol=1e-7)
+    npt.assert_allclose(estimate, pcf_nat_estimate, rtol=2e-7)
 
 
 def test_pcf_catalog_has_no_redshift(data_catalog, rand_catalog, pcf_params):

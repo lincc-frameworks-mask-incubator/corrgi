@@ -1,5 +1,6 @@
 from typing import Callable
 
+import numpy as np
 import pandas as pd
 from hipscat.catalog.catalog_info import CatalogInfo
 from lsdb import Catalog
@@ -34,4 +35,12 @@ class RedshiftCorrelation(Correlation):
         left_catalog_info: CatalogInfo,
         right_catalog_info: CatalogInfo,
     ) -> list:
+        raise NotImplementedError()
+
+    def get_bdd_counts(self) -> np.ndarray:
+        """Returns the boostrap counts for the correlation"""
+        raise NotImplementedError()
+
+    def transform_counts(self, counts: list[np.ndarray]) -> list[np.ndarray]:
+        """Applies final transformations to the correlation counts"""
         raise NotImplementedError()
