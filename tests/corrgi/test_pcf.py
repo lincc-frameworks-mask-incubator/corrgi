@@ -27,6 +27,24 @@ def test_pcf_natural_estimate_is_correct(
     npt.assert_allclose(estimate, pcf_nat_estimate, rtol=2e-7)
 
 
+def test_pcf_counts_with_weights_are_correct(
+    dask_client,
+    pcf_gals_weight_catalog,
+    pcf_rans_weight_catalog,
+    pcf_dd_counts_with_weights,
+    pcf_rr_counts_with_weights,
+    pcf_params,
+):
+    estimator = NaturalEstimator(
+        ProjectedCorrelation(params=pcf_params, use_weights=True)
+    )
+    counts_dd, counts_rr = estimator.compute_autocorrelation_counts(
+        pcf_gals_weight_catalog, pcf_rans_weight_catalog
+    )
+    npt.assert_allclose(counts_dd, pcf_dd_counts_with_weights, rtol=1e-3)
+    npt.assert_allclose(counts_rr, pcf_rr_counts_with_weights, rtol=2e-3)
+
+
 def test_pcf_catalog_has_no_redshift(data_catalog, rand_catalog, pcf_params):
     with pytest.raises(ValueError, match="ph_z not found"):
         compute_autocorrelation(

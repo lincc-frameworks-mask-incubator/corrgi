@@ -1,0 +1,8 @@
+{
+    "catalog_name": "pcf_rans_weight",
+    "catalog_type": "object",
+    "total_rows": 227336,
+    "epoch": "J2000",
+    "ra_column": "ra",
+    "dec_column": "dec"
+}
