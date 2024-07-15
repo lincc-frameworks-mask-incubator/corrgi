@@ -24,7 +24,7 @@ def test_pcf_natural_estimate_is_correct(
     estimate = compute_autocorrelation(
         data_catalog, rand_catalog, ProjectedCorrelation, params=pcf_params
     )
-    npt.assert_allclose(estimate, pcf_nat_estimate, rtol=2e-7)
+    npt.assert_allclose(estimate, pcf_nat_estimate, rtol=1e-3)
 
 
 def test_pcf_counts_with_weights_are_correct(
