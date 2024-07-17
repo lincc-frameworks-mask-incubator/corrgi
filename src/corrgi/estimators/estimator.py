@@ -7,6 +7,7 @@ from lsdb import Catalog
 
 from corrgi.correlation.correlation import Correlation
 from corrgi.correlation.projected_correlation import ProjectedCorrelation
+from corrgi.utils import compute_catalog_size
 
 
 class Estimator(ABC):
@@ -25,8 +26,8 @@ class Estimator(ABC):
         Returns:
             The statistical estimate of the auto-correlation function, as a numpy array.
         """
-        num_galaxies = catalog.hc_structure.catalog_info.total_rows
-        num_random = random.hc_structure.catalog_info.total_rows
+        num_galaxies = compute_catalog_size(catalog)
+        num_random = compute_catalog_size(random)
         dd, rr, dr = self.compute_autocorrelation_counts(catalog, random)
         args = self._get_auto_args(num_galaxies, num_random, dd, rr, dr)
         estimate, _ = self._get_auto_subroutine()(*args)
