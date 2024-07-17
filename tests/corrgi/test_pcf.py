@@ -10,11 +10,11 @@ def test_pcf_natural_counts_are_correct(
     dask_client, data_catalog, rand_catalog, pcf_dd_counts, pcf_rr_counts, pcf_params
 ):
     estimator = NaturalEstimator(ProjectedCorrelation(params=pcf_params))
-    expected_dd, expected_rr = estimator.compute_autocorrelation_counts(
+    counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
         data_catalog, rand_catalog
     )
-    npt.assert_allclose(expected_dd, pcf_dd_counts, rtol=1e-3)
-    npt.assert_allclose(expected_rr, pcf_rr_counts, rtol=2e-3)
+    npt.assert_allclose(counts_dd, pcf_dd_counts, rtol=1e-3)
+    npt.assert_allclose(counts_rr, pcf_rr_counts, rtol=2e-3)
 
 
 def test_pcf_natural_estimate_is_correct(
@@ -38,7 +38,7 @@ def test_pcf_counts_with_weights_are_correct(
     estimator = NaturalEstimator(
         ProjectedCorrelation(params=pcf_params, use_weights=True)
     )
-    counts_dd, counts_rr = estimator.compute_autocorrelation_counts(
+    counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
         pcf_gals_weight_catalog, pcf_rans_weight_catalog
     )
     npt.assert_allclose(counts_dd, pcf_dd_counts_with_weights, rtol=1e-3)

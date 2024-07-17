@@ -17,7 +17,7 @@ def test_acf_natural_counts_are_correct(
     dask_client, data_catalog, rand_catalog, acf_dd_counts, acf_rr_counts, acf_params
 ):
     estimator = NaturalEstimator(AngularCorrelation(params=acf_params))
-    counts_dd, counts_rr = estimator.compute_autocorrelation_counts(
+    counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
         data_catalog, rand_catalog
     )
     npt.assert_allclose(counts_dd, acf_dd_counts, rtol=1e-3)
@@ -45,7 +45,7 @@ def test_acf_natural_counts_with_weights_are_correct(
     estimator = NaturalEstimator(
         AngularCorrelation(params=acf_params, use_weights=True)
     )
-    counts_dd, counts_rr = estimator.compute_autocorrelation_counts(
+    counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
         acf_gals_weight_catalog, acf_rans_weight_catalog
     )
     npt.assert_allclose(counts_dd, acf_dd_counts_with_weights, rtol=1e-3)

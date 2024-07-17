@@ -2,7 +2,6 @@ import dask
 import numpy as np
 from lsdb import Catalog
 
-from corrgi.correlation.projected_correlation import ProjectedCorrelation
 from corrgi.dask import perform_auto_counts
 from corrgi.estimators.estimator import Estimator
 
@@ -10,28 +9,21 @@ from corrgi.estimators.estimator import Estimator
 class NaturalEstimator(Estimator):
     """Natural Estimator (`DD/RR - 1`)"""
 
-    def compute_autocorrelation_counts(self, catalog: Catalog, random: Catalog) -> list[np.ndarray]:
-        """Computes the auto-correlation counts for the provided catalog"""
+    def compute_autocorrelation_counts(
+        self, catalog: Catalog, random: Catalog
+    ) -> list[np.ndarray, np.ndarray, np.ndarray | int]:
+        """Computes the auto-correlation counts for the provided catalog.
+
+        Args:
+            catalog (Catalog): A galaxy samples catalog.
+            random (Catalog): A random samples catalog.
+
+        Returns:
+            The DD, RR and DR counts for the natural estimator.
+        """
         counts_dd = perform_auto_counts(catalog, self.correlation)
         counts_rr = perform_auto_counts(random, self.correlation)
-        counts = dask.compute(*[counts_dd, counts_rr])
-        return self.correlation.transform_counts(counts)
-
-    def _get_auto_args(
-        self, counts_dd: np.ndarray, counts_rr: np.ndarray, num_galaxies: int, num_random: int
-    ) -> list:
-        """Returns the args for the auto-correlation estimator subroutine"""
-        bdd = self.correlation.get_bdd_counts()
         counts_dr = 0  # The natural estimator does not use DR counts
-        args = [
-            num_galaxies,
-            num_random,
-            counts_dd,
-            bdd,
-            counts_rr,
-            counts_dr,
-            self.correlation.params.estimator,
-        ]
-        if isinstance(self.correlation, ProjectedCorrelation):
-            args = [*args[:6], self.correlation.params.dsepv, args[-1]]
-        return args
+        counts_dd_rr = dask.compute(*[counts_dd, counts_rr])
+        counts_dd_rr = self.correlation.transform_counts(counts_dd_rr)
+        return [*counts_dd_rr, counts_dr]
