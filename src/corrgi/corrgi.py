@@ -5,6 +5,7 @@ from munch import Munch
 from corrgi.correlation.correlation import Correlation
 from corrgi.dask import compute_autocorrelation_counts
 from corrgi.estimators import calculate_natural_estimate
+from corrgi.utils import compute_catalog_size
 
 
 def compute_autocorrelation(
@@ -24,9 +25,9 @@ def compute_autocorrelation(
     """
     correlation = corr_type(**kwargs)
     correlation.validate([catalog, random])
+    num_galaxies = compute_catalog_size(catalog)
+    num_random = compute_catalog_size(random)
     counts_dd, counts_rr = compute_autocorrelation_counts(catalog, random, correlation)
-    num_galaxies = catalog.hc_structure.catalog_info.total_rows
-    num_random = random.hc_structure.catalog_info.total_rows
     return calculate_natural_estimate(counts_dd, counts_rr, num_galaxies, num_random)
 
 

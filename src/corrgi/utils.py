@@ -1,5 +1,6 @@
 import numpy as np
 from gundam import gundam
+from lsdb import Catalog
 from numpy import deg2rad
 
 
@@ -42,3 +43,15 @@ def join_count_histograms(partial_histograms: list[np.ndarray]) -> np.ndarray:
         The numpy array with the total counts for the partial histograms.
     """
     return np.sum(np.stack(partial_histograms), axis=0)
+
+
+def compute_catalog_size(catalog: Catalog) -> int:
+    """Compute the number of rows in a catalog.
+
+    Args:
+        catalog (Catalog): An LSDB catalog.
+
+    Returns:
+        The number of rows in the catalog.
+    """
+    return catalog._ddf.shape[0].compute()
