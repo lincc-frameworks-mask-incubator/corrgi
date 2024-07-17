@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dask
 import numpy as np
 from lsdb import Catalog
