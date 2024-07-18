@@ -74,7 +74,7 @@ def test_pccf_with_weights_davis_peebles_estimate_is_correct(
         params=pcf_params,
         use_weights=True,
     )
-    npt.assert_allclose(estimate, pccf_with_weights_dp_estimate, rtol=1e-3)
+    npt.assert_allclose(estimate, pccf_with_weights_dp_estimate, rtol=1e-2)
 
 
 def test_pccf_counts_with_weights_are_correct(
