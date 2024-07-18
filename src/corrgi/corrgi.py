@@ -2,8 +2,7 @@ import numpy as np
 from lsdb import Catalog
 
 from corrgi.correlation.correlation import Correlation
-from corrgi.dask import compute_autocorrelation_counts, compute_crosscorrelation_counts
-from corrgi.estimators import calculate_tpccf, calculate_tpcf
+from corrgi.estimators.estimator_factory import get_estimator_for_correlation
 
 
 def compute_autocorrelation(
@@ -23,10 +22,8 @@ def compute_autocorrelation(
     """
     correlation = corr_type(**kwargs)
     correlation.validate([catalog, random])
-    counts_dd, counts_rr = compute_autocorrelation_counts(catalog, random, correlation)
-    num_particles = catalog.hc_structure.catalog_info.total_rows
-    num_random = random.hc_structure.catalog_info.total_rows
-    return calculate_tpcf(counts_dd, counts_rr, num_particles, num_random)
+    estimator = get_estimator_for_correlation(correlation)
+    return estimator.compute_auto_estimate(catalog, random)
 
 
 def compute_crosscorrelation(
@@ -47,7 +44,5 @@ def compute_crosscorrelation(
     """
     correlation = corr_type(**kwargs)
     correlation.validate([left, right, random])
-    counts_cd, counts_cr = compute_crosscorrelation_counts(left, right, random, correlation)
-    num_particles = left.hc_structure.catalog_info.total_rows
-    num_random = random.hc_structure.catalog_info.total_rows
-    return calculate_tpccf(counts_cd, counts_cr, num_particles, num_random)
+    estimator = get_estimator_for_correlation(correlation)
+    return estimator.compute_cross_estimate(left, right, random)
