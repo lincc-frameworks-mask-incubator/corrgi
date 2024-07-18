@@ -83,7 +83,7 @@ def test_pccf_counts_with_weights_are_correct(
     pcf_gals1_weight_catalog,
     pcf_rans_weight_catalog,
     pccf_cd_counts_with_weights,
-    pccf_cr_counts_with_weight,
+    pccf_cr_counts_with_weights,
     pcf_params,
 ):
     estimator = DavisPeeblesEstimator(
@@ -93,4 +93,4 @@ def test_pccf_counts_with_weights_are_correct(
         pcf_gals_weight_catalog, pcf_gals1_weight_catalog, pcf_rans_weight_catalog
     )
     npt.assert_allclose(counts_cd, pccf_cd_counts_with_weights, rtol=1e-3)
-    npt.assert_allclose(counts_cr, pccf_cr_counts_with_weight, rtol=2e-3)
+    npt.assert_allclose(counts_cr, pccf_cr_counts_with_weights, rtol=2e-3)

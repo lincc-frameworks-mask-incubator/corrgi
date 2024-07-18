@@ -22,8 +22,8 @@ class Estimator(ABC):
         """Computes the auto-correlation for this estimator.
 
         Args:
-            catalog (Catalog): The catalog of galaxy samples.
-            random (Catalog): The catalog of random samples.
+            catalog (Catalog): The catalog of galaxy samples (D).
+            random (Catalog): The catalog of random samples (R).
 
         Returns:
             The statistical estimate of the auto-correlation function, as a numpy array.
@@ -39,9 +39,9 @@ class Estimator(ABC):
         """Computes the cross-correlation for this estimator.
 
         Args:
-            left (Catalog): The left catalog of galaxy samples.
-            right (Catalog): The right catalog of galaxy samples.
-            random (Catalog): The catalog of random samples.
+            left (Catalog): The left catalog of galaxy samples (D).
+            right (Catalog): The right catalog of galaxy samples (C).
+            random (Catalog): The catalog of random samples (R).
 
         Returns:
             The statistical estimate of the cross-correlation function, as a numpy array.
@@ -65,7 +65,7 @@ class Estimator(ABC):
     @abstractmethod
     def compute_crosscorrelation_counts(
         self, left: Catalog, right: Catalog, random: Catalog
-    ) -> list[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> list[np.ndarray, np.ndarray]:
         """Computes the cross-correlation counts (CD, CR)."""
         raise NotImplementedError()
 
@@ -102,7 +102,7 @@ class Estimator(ABC):
         counts_cr: np.ndarray,
     ) -> list:
         """Returns the args for the cross-correlation estimator routine"""
-        counts_bdd = self.correlation.get_bdd_counts()  # TODO: Change this
+        counts_bdd = self.correlation.get_bdd_counts()
         args = [num_galaxies, num_random, counts_cd, counts_bdd, counts_cr]
         if isinstance(self.correlation, ProjectedCorrelation):
             # The projected routines require an additional parameter

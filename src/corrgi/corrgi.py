@@ -11,14 +11,16 @@ def compute_autocorrelation(
     """Calculates the auto-correlation for a catalog.
 
     Args:
-        catalog (Catalog): The catalog.
-        random (Catalog): A random samples catalog.
+        catalog (Catalog): The galaxies catalog (D).
+        random (Catalog): A random samples catalog (R).
         corr_type (type[Correlation]): The corrgi class corresponding to the type of
             correlation (AngularCorrelation, RedshiftCorrelation, or ProjectedCorrelation).
         **kwargs (dict): The arguments for the creation of the correlation instance.
 
     Returns:
-        A numpy array with the result of the auto-correlation, using the natural estimator.
+        A numpy array with the result of the auto-correlation, according to the estimator
+        provided in the correlation kwargs. More information on how to set up the input parameters
+        in https://gundam.readthedocs.io/en/latest/introduction.html#set-up-input-parameters.
     """
     correlation = corr_type(**kwargs)
     correlation.validate([catalog, random])
@@ -32,15 +34,17 @@ def compute_crosscorrelation(
     """Computes the cross-correlation between two catalogs.
 
     Args:
-        left (Catalog): Left catalog for the cross-correlation.
-        right (Catalog): Right catalog for the cross-correlation.
-        random (Catalog): A random samples catalog.
+        left (Catalog): Left catalog for the cross-correlation (D).
+        right (Catalog): Right catalog for the cross-correlation (C).
+        random (Catalog): A random samples catalog (R).
         corr_type (type[Correlation]): The corrgi class corresponding to the type of
             correlation (AngularCorrelation, RedshiftCorrelation, or ProjectedCorrelation).
         **kwargs (dict): The arguments for the creation of the correlation instance.
 
     Returns:
-        A numpy array with the result of the cross-correlation, using the natural estimator.
+        A numpy array with the result of the cross-correlation, according to the estimator
+        provided in the correlation kwargs. More information on how to set up the input parameters
+        in https://gundam.readthedocs.io/en/latest/introduction.html#set-up-input-parameters.
     """
     correlation = corr_type(**kwargs)
     correlation.validate([left, right, random])

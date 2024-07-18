@@ -17,8 +17,8 @@ class NaturalEstimator(Estimator):
         """Computes the auto-correlation counts for the provided catalog (`DD/RR - 1`).
 
         Args:
-            catalog (Catalog): A galaxy samples catalog.
-            random (Catalog): A random samples catalog.
+            catalog (Catalog): A galaxy samples catalog (D).
+            random (Catalog): A random samples catalog (R).
 
         Returns:
             The DD, RR and DR counts for the natural estimator.
