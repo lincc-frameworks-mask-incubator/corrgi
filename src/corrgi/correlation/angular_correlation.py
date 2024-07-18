@@ -1,6 +1,7 @@
 from typing import Callable
 
 import gundam.cflibfor as cff
+import numpy as np
 import pandas as pd
 from gundam import gundam
 from hipscat.catalog.catalog_info import CatalogInfo
@@ -64,3 +65,7 @@ class AngularCorrelation(Correlation):
                 *args[5:],
             ]
         return args
+
+    def get_bdd_counts(self) -> np.ndarray:
+        """Returns the boostrap counts for the angular correlation"""
+        return np.zeros([self.params.nsept, 0])

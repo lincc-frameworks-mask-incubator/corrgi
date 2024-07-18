@@ -94,3 +94,11 @@ class ProjectedCorrelation(Correlation):
                 *args[7:],
             ]
         return args
+
+    def transform_counts(self, counts: list[np.ndarray]) -> list[np.ndarray]:
+        """The projected counts need to be transposed before being sent to Fortran"""
+        return [c.transpose([1, 0]) for c in counts]
+
+    def get_bdd_counts(self) -> np.ndarray:
+        """Returns the boostrap counts for the projected correlation"""
+        return np.zeros([self.params.nsepp, self.params.nsepv, 0])

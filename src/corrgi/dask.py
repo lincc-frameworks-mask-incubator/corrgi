@@ -12,22 +12,6 @@ from corrgi.correlation.correlation import Correlation
 from corrgi.utils import join_count_histograms
 
 
-def compute_autocorrelation_counts(catalog: Catalog, random: Catalog, correlation: Correlation) -> np.ndarray:
-    """Computes the auto-correlation counts for a catalog.
-
-    Args:
-        catalog (Catalog): The catalog with galaxy samples.
-        random (Catalog): The catalog with random samples.
-        correlation (Correlation): The correlation instance.
-
-    Returns:
-        The histogram counts to calculate the auto-correlation.
-    """
-    counts_dd = perform_auto_counts(catalog, correlation)
-    counts_rr = perform_auto_counts(random, correlation)
-    return dask.compute(*[counts_dd, counts_rr])
-
-
 def perform_auto_counts(catalog: Catalog, *args) -> np.ndarray:
     """Aligns the pixel of a single catalog and performs the pairs counting.
 

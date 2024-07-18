@@ -83,6 +83,15 @@ class Correlation(ABC):
         """Generate the arguments required for the cross pairing method"""
         raise NotImplementedError()
 
+    @abstractmethod
+    def get_bdd_counts(self) -> np.ndarray:
+        """Returns the boostrap counts for the correlation"""
+        raise NotImplementedError()
+
+    def transform_counts(self, counts: list[np.ndarray]) -> list[np.ndarray]:
+        """Applies final transformations to the correlation counts"""
+        return counts
+
     @staticmethod
     def get_coords(df: pd.DataFrame, catalog_info: CatalogInfo) -> tuple[float, float, float]:
         """Calculate the cartesian coordinates for the points in the partition"""
