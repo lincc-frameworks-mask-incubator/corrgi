@@ -1,8 +1,9 @@
 from corrgi.correlation.correlation import Correlation
+from corrgi.estimators.davis_peebles_estimator import DavisPeeblesEstimator
 from corrgi.estimators.estimator import Estimator
 from corrgi.estimators.natural_estimator import NaturalEstimator
 
-estimator_class_for_type: dict[str, type[Estimator]] = {"NAT": NaturalEstimator}
+estimator_class_for_type: dict[str, type[Estimator]] = {"NAT": NaturalEstimator, "DP": DavisPeeblesEstimator}
 
 
 def get_estimator_for_correlation(correlation: Correlation) -> Estimator:
