@@ -19,3 +19,9 @@ def test_crosscorrelation_alignment(dr7_lrg_catalog_dir, dr7_lrg_rand_catalog_di
     ## 12*21 = 252
     assert len(alignment.pixel_mapping) == 252
     assert len(alignment.pixel_mapping.columns) == 6
+
+def test_autocorrelation_alignment_constrained(data_catalog_dir, acf_corr_bins):
+    data_catalog = hipscat.read_from_hipscat(data_catalog_dir)
+    alignment = autocorrelation_alignment(data_catalog, acf_corr_bins)
+    assert len(alignment.pixel_mapping) == 14
+    assert len(alignment.pixel_mapping.columns) == 6
