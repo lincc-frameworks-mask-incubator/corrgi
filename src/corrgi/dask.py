@@ -23,7 +23,10 @@ def perform_auto_counts(catalog: Catalog, *args) -> np.ndarray:
         The histogram with the sample distance counts.
     """
     # Get counts between points of different partitions
-    alignment = autocorrelation_alignment(catalog.hc_structure)
+    bins = args[0].make_bins()
+    if len(bins) == 2:
+        bins = bins[0]
+    alignment = autocorrelation_alignment(catalog.hc_structure, bins)
     left_pixels, right_pixels = get_healpix_pixels_from_alignment(alignment)
     cross_partials = align_and_apply(
         [(catalog, left_pixels), (catalog, right_pixels)], count_cross_pairs, *args
