@@ -4,7 +4,6 @@ import gundam.cflibfor as cff
 import numpy as np
 import pandas as pd
 from gundam import gundam
-from hipscat.catalog.catalog_info import CatalogInfo
 from munch import Munch
 
 from corrgi.correlation.correlation import Correlation
@@ -13,7 +12,12 @@ from corrgi.correlation.correlation import Correlation
 class AngularCorrelation(Correlation):
     """The angular correlation utilities."""
 
-    def __init__(self, params: Munch, weight_column: str = "wei", use_weights: bool = False):
+    def __init__(
+        self,
+        params: Munch,
+        weight_column: str = "wei",
+        use_weights: bool = False,
+    ):
         super().__init__(params, weight_column, use_weights)
         self.sept = self.make_bins()
 
@@ -30,10 +34,10 @@ class AngularCorrelation(Correlation):
     def _get_cross_method(self) -> Callable:
         return cff.mod.th_C_wg_naiveway if self.use_weights else cff.mod.th_C_naiveway
 
-    def _construct_auto_args(self, df: pd.DataFrame, catalog_info: CatalogInfo) -> list:
+    def _construct_auto_args(self, df: pd.DataFrame, ra_column: str, dec_column: str) -> list:
         args = [
             len(df),
-            *self.get_coords(df, catalog_info),  # cartesian coordinates
+            *self.get_coords(df, ra_column, dec_column),  # cartesian coordinates
             self.params.nsept,  # number of angular separation bins
             self.sept,  # bins in angular separation [deg]
         ]
@@ -45,14 +49,16 @@ class AngularCorrelation(Correlation):
         self,
         left_df: pd.DataFrame,
         right_df: pd.DataFrame,
-        left_catalog_info: CatalogInfo,
-        right_catalog_info: CatalogInfo,
+        left_ra_column: str,
+        left_dec_column: str,
+        right_ra_column: str,
+        right_dec_column: str,
     ) -> list:
         args = [
             len(left_df),  # number of particles of the left partition
-            *self.get_coords(left_df, left_catalog_info),  # X,Y,Z coordinates of particles
+            *self.get_coords(left_df, left_ra_column, left_dec_column),  # X,Y,Z coordinates of particles
             len(right_df),  # number of particles of the right partition
-            *self.get_coords(right_df, right_catalog_info),  # X,Y,Z coordinates of particles
+            *self.get_coords(right_df, right_ra_column, right_dec_column),  # X,Y,Z coordinates of particles
             self.params.nsept,  # number of angular separation bins
             self.sept,  # bins in angular separation [deg]
         ]

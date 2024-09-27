@@ -19,6 +19,7 @@ requires-python = ">=3.9, <3.12"
 dependencies = [
     "lsdb",
     "hipscat",
+    "hipscat-import",
     "gundam",
     "numpy<2",
 ]

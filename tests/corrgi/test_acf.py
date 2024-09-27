@@ -14,50 +14,74 @@ def test_acf_bins_are_correct(acf_bins_left_edges, acf_bins_right_edges, acf_par
 
 
 def test_acf_natural_counts_are_correct(
-    dask_client, data_catalog, rand_catalog, acf_dd_counts, acf_rr_counts, acf_params
+    dask_client,
+    data_catalog_dir,
+    rand_catalog_dir,
+    acf_dd_counts,
+    acf_rr_counts,
+    acf_params,
+    tmp_path,
 ):
     estimator = NaturalEstimator(AngularCorrelation(params=acf_params))
     counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
-        data_catalog, rand_catalog
+        data_catalog_dir, rand_catalog_dir, output_dir=tmp_path, client=dask_client
     )
     npt.assert_allclose(counts_dd, acf_dd_counts, rtol=1e-3)
     npt.assert_allclose(counts_rr, acf_rr_counts, rtol=2e-3)
 
 
 def test_acf_natural_estimate_is_correct(
-    dask_client, data_catalog, rand_catalog, acf_nat_estimate, acf_params
+    dask_client,
+    data_catalog_dir,
+    rand_catalog_dir,
+    acf_nat_estimate,
+    acf_params,
+    tmp_path,
 ):
     acf_params.estimator = "NAT"
     estimate = compute_autocorrelation(
-        data_catalog, rand_catalog, AngularCorrelation, params=acf_params
+        data_catalog_dir,
+        rand_catalog_dir,
+        output_dir=tmp_path,
+        client=dask_client,
+        corr_type=AngularCorrelation,
+        params=acf_params,
     )
     npt.assert_allclose(estimate, acf_nat_estimate, rtol=1e-7)
 
 
 def test_acf_natural_counts_with_weights_are_correct(
     dask_client,
-    acf_gals_weight_catalog,
-    acf_rans_weight_catalog,
+    acf_gals_weight_dir,
+    acf_rans_weight_dir,
     acf_dd_counts_with_weights,
     acf_rr_counts_with_weights,
     acf_params,
+    tmp_path,
 ):
     estimator = NaturalEstimator(
         AngularCorrelation(params=acf_params, use_weights=True)
     )
     counts_dd, counts_rr, _ = estimator.compute_autocorrelation_counts(
-        acf_gals_weight_catalog, acf_rans_weight_catalog
+        acf_gals_weight_dir,
+        acf_rans_weight_dir,
+        output_dir=tmp_path,
+        client=dask_client,
     )
     npt.assert_allclose(counts_dd, acf_dd_counts_with_weights, rtol=1e-3)
     npt.assert_allclose(counts_rr, acf_rr_counts_with_weights, rtol=2e-3)
 
 
-def test_acf_weights_not_provided(data_catalog, rand_catalog, acf_params):
+def test_acf_weights_not_provided(
+    dask_client, data_catalog_dir, rand_catalog_dir, acf_params, tmp_path
+):
     with pytest.raises(ValueError, match="does not exist"):
         compute_autocorrelation(
-            data_catalog,
-            rand_catalog,
-            AngularCorrelation,
+            data_catalog_dir,
+            rand_catalog_dir,
+            output_dir=tmp_path,
+            client=dask_client,
+            corr_type=AngularCorrelation,
             params=acf_params,
             use_weights=True,
         )

@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import gundam
-import lsdb
 import numpy as np
 import pandas as pd
 import pytest
@@ -11,7 +10,7 @@ from dask.distributed import Client
 @pytest.fixture(scope="session", name="dask_client")
 def dask_client():
     """Create a single client for use by all unit test cases."""
-    client = Client(n_workers=3, threads_per_worker=1)
+    client = Client(n_workers=4, threads_per_worker=1)
     yield client
     client.close()
 
@@ -47,18 +46,8 @@ def data_catalog_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
-def data_catalog(data_catalog_dir):
-    return lsdb.read_hipscat(data_catalog_dir)
-
-
-@pytest.fixture
 def rand_catalog_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "RAND"
-
-
-@pytest.fixture
-def rand_catalog(rand_catalog_dir):
-    return lsdb.read_hipscat(rand_catalog_dir)
 
 
 @pytest.fixture
@@ -67,28 +56,18 @@ def dr7_lrg_catalog_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
-def dr7_lrg_catalog(dr7_lrg_catalog_dir):
-    return lsdb.read_hipscat(dr7_lrg_catalog_dir)
-
-
-@pytest.fixture
 def dr7_lrg_rand_catalog_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "DR7-lrg-rand"
 
 
 @pytest.fixture
-def dr7_lrg_rand_catalog(dr7_lrg_rand_catalog_dir):
-    return lsdb.read_hipscat(dr7_lrg_rand_catalog_dir)
+def acf_gals_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "acf_gals_weight"
 
 
 @pytest.fixture
-def acf_gals_weight_catalog(hipscat_catalogs_dir):
-    return lsdb.read_hipscat(hipscat_catalogs_dir / "acf_gals_weight")
-
-
-@pytest.fixture
-def acf_rans_weight_catalog(hipscat_catalogs_dir):
-    return lsdb.read_hipscat(hipscat_catalogs_dir / "acf_rans_weight")
+def acf_rans_weight_dir(hipscat_catalogs_dir):
+    return hipscat_catalogs_dir / "acf_rans_weight"
 
 
 @pytest.fixture
@@ -97,28 +76,13 @@ def pcf_gals_weight_dir(hipscat_catalogs_dir):
 
 
 @pytest.fixture
-def pcf_gals_weight_catalog(pcf_gals_weight_dir):
-    return lsdb.read_hipscat(pcf_gals_weight_dir)
-
-
-@pytest.fixture
 def pcf_gals1_weight_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "pcf_gals1_weight"
 
 
 @pytest.fixture
-def pcf_gals1_weight_catalog(pcf_gals1_weight_dir):
-    return lsdb.read_hipscat(pcf_gals1_weight_dir)
-
-
-@pytest.fixture
 def pcf_rans_weight_dir(hipscat_catalogs_dir):
     return hipscat_catalogs_dir / "pcf_rans_weight"
-
-
-@pytest.fixture
-def pcf_rans_weight_catalog(pcf_rans_weight_dir):
-    return lsdb.read_hipscat(pcf_rans_weight_dir)
 
 
 @pytest.fixture

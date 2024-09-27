@@ -1,6 +1,7 @@
+import hipscat as hc
 import numpy as np
 from gundam import gundam
-from lsdb import Catalog
+from hipscat.io import FilePointer
 from numpy import deg2rad
 
 
@@ -45,13 +46,15 @@ def join_count_histograms(partial_histograms: list[np.ndarray]) -> np.ndarray:
     return np.sum(np.stack(partial_histograms), axis=0)
 
 
-def compute_catalog_size(catalog: Catalog) -> int:
+def read_catalog_total_rows(catalog_base_dir: FilePointer) -> int:
     """Compute the number of rows in a catalog.
 
     Args:
-        catalog (Catalog): An LSDB catalog.
+        catalog_base_dir (str): An LSDB catalog.
 
     Returns:
         The number of rows in the catalog.
     """
-    return catalog._ddf.shape[0].compute()
+    metadata_fp = hc.io.get_parquet_metadata_pointer(catalog_base_dir)
+    metadata = hc.io.file_io.read_parquet_metadata(metadata_fp)
+    return metadata.num_rows
